@@ -11,7 +11,7 @@
 
 This is the working repo for a 45-minute talk that introduces LLM fundamentals (tokenization, context windows, RAG, schema-constrained output, failure modes) to a clinical/translational psychiatry audience, with two live Colab notebook demos.
 
-Content design (specs, synthetic clinical data, visual assets) is **complete**. What's left is engineering: convert the specs to working `.ipynb` files, verify against a real Vertex AI project, host on GitHub Pages, rehearse.
+Content design (specs, synthetic clinical data, visual assets) is **complete**. What's left is engineering: convert the specs to working `.ipynb` files, verify against the Google AI Studio API, host on GitHub Pages, rehearse.
 
 ---
 
@@ -40,7 +40,7 @@ PNG + SVG of each visual; SVG is the source of truth, PNG is for quick mobile pr
 ## What's locked (don't redesign without good reason)
 
 - **Two notebooks**, not one. NB1 = "How LLMs see clinical text" (tokenization, positional encoding, context). NB2 = "Using LLMs for psychiatric research" (RAG, schema extraction, failure modes).
-- **Provider-agnostic `call_llm()` wrapper** with Gemini 2.5 Flash as the default backend (via Vertex AI). Commented Claude/OpenAI alternatives. Audience sees this is concept-first, not vendor-promotion.
+- **Provider-agnostic `call_llm()` wrapper** with Gemini 2.5 Flash as the default backend (via the free Google AI Studio API — audience can run with a 60-second `GEMINI_API_KEY` setup, no GCP project needed). Commented Claude/OpenAI alternatives. Audience sees this is concept-first, not vendor-promotion.
 - **Whitfield chart** as the long-context demo content. SSRI-induced SIADH/seizure in 2022 is the documented contraindication; current admission's Plan re-proposes sertraline. ~12,500 words, 28 documents, no in-chart safety catch (max demo teeth).
 - **RAG corpus** = 5 real open-access ketamine/esketamine TRD papers (Berman 2000, Zarate 2006, Murrough 2013, Daly 2018, McIntyre 2021), abstracts to be baked into NB2 as Python strings.
 - **Schema extraction** input = Document 24 of the chart (current admission H&P).
@@ -51,7 +51,7 @@ PNG + SVG of each visual; SVG is the source of truth, PNG is for quick mobile pr
 ## What's still open
 
 **Immediate (Claude Code work):**
-- Convert NB1_SPEC.md → working `.ipynb` that runs end-to-end on Logan's Vertex AI project.
+- Convert NB1_SPEC.md → working `.ipynb` that runs end-to-end via the AI Studio API.
 - Convert NB2_SPEC.md → working `.ipynb`.
 - Resolve `google-genai` SDK API surface — code in specs is best-guess, will need adjustment to match installed SDK version. Especially the structured-output API (`response_schema` with Pydantic) which has been volatile.
 - Replace the chart-loading placeholder URL (`https://[hosted-location]/whitfield_chart_FULL.md`) in NB1 with either a GitHub raw URL after pushing the repo, or paste the chart inline as a Python string.
