@@ -1,0 +1,218 @@
+/* ── Palette (locked aesthetic) ─────────────────────────────────────────── */
+:root {
+  --paper:   #fdfbf4;
+  --ink:     #1a1a1a;
+  --ink-2:   #4a4a4a;
+  --teal:    #06B6D4;
+  --teal-d:  #0891b2;
+  --rule:    rgba(26, 26, 26, 0.12);
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+
+  --maxw: 920px;
+  --pad:  clamp(1.25rem, 3vw, 2rem);
+}
+
+/* ── Reset-ish ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+img, svg { max-width: 100%; height: auto; display: block; }
+a { color: var(--teal-d); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 120ms; }
+a:hover { border-bottom-color: var(--teal-d); }
+code { font-family: var(--font-mono); font-size: 0.9em; background: rgba(6, 182, 212, 0.08); padding: 0.1em 0.35em; border-radius: 3px; }
+
+h1, h2, h3 { font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; color: var(--ink); }
+h1 { font-size: clamp(1.75rem, 4.5vw, 2.5rem); margin: 0 0 0.5em; }
+h2 { font-size: clamp(1.4rem, 3vw, 1.75rem); margin: 0 0 0.75em; }
+h3 { font-size: 1.15rem; margin: 0 0 0.5em; }
+
+/* ── Top nav ────────────────────────────────────────────────────────────── */
+.topnav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(253, 251, 244, 0.92);
+  backdrop-filter: saturate(140%) blur(8px);
+  border-bottom: 1px solid var(--rule);
+}
+.topnav-inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0.85rem var(--pad);
+  display: flex;
+  gap: 1.4rem;
+  align-items: center;
+  font-size: 0.92rem;
+}
+.topnav a {
+  color: var(--ink-2);
+  border-bottom: none;
+}
+.topnav a:hover { color: var(--ink); }
+.topnav .spacer { flex: 1; }
+.topnav .gh {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+/* ── Hero ───────────────────────────────────────────────────────────────── */
+.hero {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 2.5rem var(--pad) 1rem;
+}
+.hero img {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+.hero .meta {
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  color: var(--ink-2);
+  margin: 0;
+}
+.hero .meta strong { color: var(--ink); }
+
+/* ── Sections ───────────────────────────────────────────────────────────── */
+main {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 var(--pad);
+}
+section {
+  padding: 2.75rem 0 1rem;
+}
+section p { color: var(--ink); margin: 0 0 1em; }
+section p:last-child { margin-bottom: 0; }
+
+.divider {
+  width: 100%;
+  margin: 1rem 0;
+  opacity: 0.85;
+}
+
+/* ── Notebook cards ─────────────────────────────────────────────────────── */
+.nb-card {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 2rem;
+  align-items: center;
+  padding: 1.75rem 0;
+  border-top: 1px solid var(--rule);
+}
+.nb-card:last-of-type { border-bottom: 1px solid var(--rule); }
+.nb-card.reversed { grid-template-columns: 1fr 1.2fr; }
+.nb-card.reversed .nb-figure { order: -1; }
+
+.nb-text h3 { margin-bottom: 0.4em; }
+.nb-text .label {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--teal-d);
+  text-transform: uppercase;
+  margin-bottom: 0.5em;
+}
+.nb-text p { font-size: 0.97rem; color: var(--ink-2); }
+.nb-figure img { width: 100%; }
+
+.btns { display: flex; gap: 0.65rem; margin-top: 1rem; flex-wrap: wrap; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.95rem;
+  border: 1px solid var(--ink);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink);
+  background: transparent;
+  transition: background 120ms, color 120ms, border-color 120ms;
+}
+.btn:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.btn.primary { background: var(--teal); border-color: var(--teal); color: white; }
+.btn.primary:hover { background: var(--teal-d); border-color: var(--teal-d); color: white; }
+
+/* ── Setup steps ────────────────────────────────────────────────────────── */
+ol.setup {
+  list-style: none;
+  counter-reset: step;
+  padding: 0;
+  margin: 0;
+}
+ol.setup li {
+  counter-increment: step;
+  padding-left: 2.6rem;
+  position: relative;
+  margin-bottom: 1.1rem;
+}
+ol.setup li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 50%;
+  background: var(--teal);
+  color: white;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── References ─────────────────────────────────────────────────────────── */
+.refs { font-size: 0.92rem; color: var(--ink-2); }
+.refs h3 {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--teal-d);
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+}
+.refs ul { padding-left: 1.2rem; margin: 0; }
+.refs li { margin-bottom: 0.4em; }
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
+footer {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 2.5rem var(--pad) 3rem;
+  border-top: 1px solid var(--rule);
+  margin-top: 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink-2);
+}
+footer a { color: var(--ink-2); }
+footer a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .nb-card, .nb-card.reversed {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  .nb-card.reversed .nb-figure { order: 0; }
+  .topnav-inner { gap: 0.9rem; font-size: 0.85rem; }
+}

@@ -51,11 +51,11 @@ PNG + SVG of each visual; SVG is the source of truth, PNG is for quick mobile pr
 ## What's still open
 
 **Immediate (Claude Code work):**
-- Convert NB1_SPEC.md → working `.ipynb` that runs end-to-end via the AI Studio API.
-- Convert NB2_SPEC.md → working `.ipynb`.
-- Resolve `google-genai` SDK API surface — code in specs is best-guess, will need adjustment to match installed SDK version. Especially the structured-output API (`response_schema` with Pydantic) which has been volatile.
-- Replace the chart-loading placeholder URL (`https://[hosted-location]/whitfield_chart_FULL.md`) in NB1 with either a GitHub raw URL after pushing the repo, or paste the chart inline as a Python string.
-- Build a simple GitHub Pages landing page (single HTML file) with `header.svg`, brief framing, and "Open in Colab" buttons for both notebooks.
+- ~~Convert NB1_SPEC.md → working `.ipynb`.~~ ✓ Shipped at `notebooks/01_how_llms_see_clinical_text.ipynb`.
+- ~~Convert NB2_SPEC.md → working `.ipynb`.~~ ✓ Shipped at `notebooks/02_using_llms_for_psychiatric_research.ipynb`.
+- ~~Replace the chart-loading placeholder URL.~~ ✓ Both notebooks point at `raw.githubusercontent.com/.../main/content/whitfield_chart_FULL.md`.
+- ~~Build the GitHub Pages landing page.~~ ✓ Live at `docs/`, served from `https://grosenick-lab-cornell.github.io/sobp-2026-transformers/`.
+- Verify the `google-genai` SDK calls work end-to-end against AI Studio. Especially the structured-output API (`response_schema` with Pydantic) in NB2 §2 — has been volatile across SDK versions. First test: open NB1 in Colab, set `GEMINI_API_KEY`, run.
 
 **Rehearsal-time:**
 - Verify Gemini 2.5 Flash actually fails (or partially fails) on the chart needle question. If it blows through cleanly, escape hatches in `PROJECT_SUMMARY.md` § "Known risks for rehearsal."
