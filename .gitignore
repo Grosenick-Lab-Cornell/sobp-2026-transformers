@@ -1,0 +1,66 @@
+# ─── Python ──────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# ─── Jupyter ─────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Notebook outputs are intentionally NOT gitignored — we commit
+# notebooks with cleared outputs, but we don't want to clobber
+# the latest run during a session. Strip outputs manually with
+# `jupyter nbconvert --clear-output` before committing if needed.
+
+# ─── HuggingFace / model caches ──────────────────────────
+# Phi-3.5 mini downloads to ~/.cache/huggingface or to a local
+# `models--*` folder if anyone runs locally. Either path is way
+# too large to commit (~7GB unquantized, ~2GB at 4-bit).
+.cache/
+huggingface/
+models--*/
+*.safetensors
+*.bin
+*.gguf
+
+# ─── Virtual environments ────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ─── IDE / editor ────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ─── OS ──────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── Working drafts / scratch ────────────────────────────
+# If anyone creates a `scratch/` or `wip/` folder for ad-hoc
+# exploration, don't commit it.
+scratch/
+wip/
+*.scratch.*
+*.wip.*
+
+# ─── Secrets ─────────────────────────────────────────────
+# This project doesn't use API keys (Phi-3.5 runs locally),
+# but defensive ignoring in case someone tests with one.
+.env
+.env.*
+*.key
+*.pem
+secrets.yaml
+secrets.json
