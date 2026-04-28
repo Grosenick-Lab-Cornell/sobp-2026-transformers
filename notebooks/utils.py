@@ -25,7 +25,7 @@ def load_model():
     """Load Phi-3.5 mini at 4-bit on GPU (or fp32 on CPU as a fallback).
 
     Returns (model, tokenizer). Slow on first call (~30 s with cached
-    weights, ~1–2 min if downloading); cheap on subsequent calls in the
+    weights, ~1-2 min if downloading); cheap on subsequent calls in the
     same Colab session because HuggingFace caches to /root/.cache.
     """
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -41,7 +41,7 @@ def load_model():
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     # trust_remote_code=False (default): use transformers' native Phi3 impl
-    # rather than the model repo's modeling_phi3.py — which calls a removed
+    # rather than the model repo's modeling_phi3.py, which calls a removed
     # DynamicCache.from_legacy_cache method on recent transformers versions.
     model = AutoModelForCausalLM.from_pretrained(
         MODEL_NAME,
