@@ -3,7 +3,7 @@
 **Speaker:** Logan Grosenick (Weill Cornell Psychiatry)
 **Venue:** SOBP, Session 1
 **Length:** 45 minutes
-**Topic:** *Generative AI and LLM Basics with Relevance to Mental Health*
+**Topic:** *Transformer & LLM Basics with Relevance to Psychiatry*
 
 ---
 
@@ -81,4 +81,4 @@ PNG + SVG of each visual; SVG is the source of truth, PNG is for quick mobile pr
 
 ## Suggested first task in Claude Code
 
-**"Read PROJECT_SUMMARY.md and specs/NB1_SPEC.md. Then convert NB1_SPEC.md into a working `.ipynb` file at `notebooks/01_how_llms_see_clinical_text.ipynb`. For now, leave the chart-loading cell with the placeholder URL — we'll fix that once the repo is pushed to GitHub. After conversion, walk me through what you'd need to verify the SDK calls work against my Vertex AI project."**
+**"Read PROJECT_SUMMARY.md and `notebooks/utils.py`. The notebooks are shipped — both run end-to-end on Colab T4 with Phi-3.5 mini local (no API key, no GCP). Open NB1 in Colab, set runtime to T4 GPU, run all cells. Report back: do the visuals render against Colab's dark background, what does Phi-3.5 generate for the chart safety question, and do the three needle-position variants (start/middle/end) produce visibly different outputs. After that, do the same for NB2 — flag if the `outlines.from_transformers(...)` schema-extraction call in §2 errors (likely fix is `outlines.models.transformers(...)` if the API has shifted)."**
