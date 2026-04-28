@@ -1,3 +1,10 @@
-google-genai>=1.0.0
-tiktoken>=0.7.0
-pydantic>=2.0
+# Pre-installed in Colab; listed for local Jupyter users.
+torch>=2.0
+transformers>=4.45
+accelerate>=0.30
+
+# Not in Colab by default.
+bitsandbytes>=0.43         # 4-bit quantization for Phi-3.5 mini on a T4
+outlines>=0.1.0            # constrained-generation for NB2 §2 schema demo
+tiktoken>=0.7.0            # tokenizer-inspection demos in NB1 §1
+pydantic>=2.0              # schema definitions in NB2 §2

@@ -12,7 +12,7 @@
 
 - Talk is the primary deliverable. Colab notebooks are the live demo mechanism (run during talk).
 - Aesthetic reference: [Cosyne 2025 Transformers in Neuroscience Tutorial](https://cosyne-tutorial-2025.github.io/) — clean, domain-grounded, narratively structured, finished-feeling. Match the overall vibe, not the depth (4-hr hands-on ≠ 45-min talk).
-- **Provider-agnostic:** Gemini 2.5 Flash is default (available via Google Cloud), but wrapped in `call_llm()` abstraction with commented-out Claude / OpenAI alternatives so audience sees this is about concepts, not vendor promotion.
+- **Provider-agnostic:** **Phi-3.5 mini Instruct** (Microsoft, 3.8B params, 128K context) is default — runs locally on Colab's free T4 GPU at 4-bit quantization, no API key, no auth, no setup beyond a 1–2 min model download on first run. Wrapped in `call_llm()` abstraction with commented-out Gemini / Claude / OpenAI alternatives so audience sees this is about concepts, not vendor promotion. Small open-source model is a *better* default for the failure-mode demos because the mechanisms (lost-in-middle, hallucination, schema slop) show up reliably at small scale; frontier models hide them intermittently.
 
 ---
 
@@ -44,7 +44,7 @@
 |---|---|
 | Talk length | 45 min |
 | Colab use | Run live during talk |
-| Model | Gemini 2.5 Flash (mid-tier, shows failure modes) |
+| Model | Phi-3.5 mini Instruct (Microsoft, 3.8B, 128K context, runs locally on Colab T4 — no API key, demonstrates failure modes reliably) |
 | Wrapper | Provider-agnostic `call_llm()` |
 | Clinical data | Fully synthetic — no real patient data, even de-identified |
 | Transformer demo in NB2 | Cut (defer to next talk's speaker) |
@@ -99,13 +99,15 @@ Inspiration: Cosyne 2025 tutorial header illustrations — looks hand-drawn but 
 
 ## Known risks for rehearsal
 
-**Gemini 2.5 Flash and lost-in-the-middle (NB1 §4 demo).** Recent literature (McKinnon 2025, arxiv 2511.05850) shows Gemini 2.5 Flash specifically does NOT exhibit the canonical lost-in-the-middle effect on simple needle-in-haystack retrieval, even at the input context limit. More broadly, the Chroma "Context Rot" report (2025) confirms frontier models pass simple NIAH but fail on harder long-context tasks: non-lexical matching (NoLiMa), multi-hop reasoning, conflict detection, distractor handling, absence detection.
+**Phi-3.5 mini and the needle demo (NB1 §4).** With a 3.8B-param model on a 17K-token chart, the failure-rate risk inverts from the original Gemini Flash plan: instead of "model might beat the needle," now the worry is "model fails everywhere uniformly, undermining the lost-in-the-middle pattern." For the demo to land we want roughly: succeeds at start/end, fails in middle. Pure failure across all three positions reads as "small model is just bad" rather than "look at how attention degrades positionally."
 
-*Why we're still OK:* our demo task is multi-hop + conflict-detection across multiple documents (find the SSRI ADR across docs 9–12, recognize the Plan in doc 24 contradicts it, recommend an alternative). This is the harder kind of task that frontier models still fail on. Simple retrieval would be the wrong demo; we don't have that problem.
+*Rehearsal escape hatches in order:* (a) shorten the chart by removing the long verbose nursing notes (Docs 27–28) — keep the chart well above the model's effective attention window but reduce overall noise; (b) make the needle slightly more salient by leaving the explicit ADR table in Doc 23; (c) pivot the framing live: even uniform failure is teachable as "this is what happens when context exceeds what the model can actually integrate."
 
-*Rehearsal escape hatches if Flash blows through anyway, in order:* (a) make the needle subtler (e.g., remove the explicit ADR table from Doc 23 so the only signal is in the discharge summary narrative); (b) drop to Gemini 1.5 Flash for that one cell; (c) pivot live: "the model got this right — but you can't know it got it right without checking, which is the deeper point and what the rest of this talk is about."
+**Schema-constrained extraction (NB2 §2).** Phi-3.5 mini via `outlines` should produce structurally valid JSON every time, but the *semantic* fidelity (correct ICD codes, correct dose values, correct ADR severity classification) will be wobbly. Rehearsal task: run the extraction 3–4 times, look for the kind of subtle wrongness (right structure, wrong content) that *makes* the cell's teaching point about "schema doesn't validate correctness." If the output is too obviously broken, dial up the prompt's "be conservative; only extract what is explicitly documented" framing.
 
-**Hallucination demo prompt (NB2 §1).** Gemini Flash output varies. Per NB2 spec, ship 3–4 candidate prompts and lock the most reproducibly-failing one at rehearsal. Pedagogical fallback: if Flash answers correctly, the lesson becomes "you can't tell that without the corpus" rather than "look how it fabricates."
+**Hallucination demo prompt (NB2 §1).** Small models tend to fabricate citations more eagerly than frontier models — this is good for the demo. Per NB2 spec, ship 3–4 candidate prompts and lock the most reproducibly-failing one at rehearsal. Phi-3.5 may go further than Flash would: be ready for citations to entirely fictional papers (good demo material).
+
+**Inference speed on stage.** A 17K-token input on Phi-3.5 mini at 4-bit on a Colab T4 takes ~30–60 sec per generation. The needle demo (3 calls) is 1.5–3 min of compute. Plan the talk pacing accordingly: kick the cell, then talk through the conceptual setup while it runs.
 
 ## Outstanding / deferred
 

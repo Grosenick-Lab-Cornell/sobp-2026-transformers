@@ -11,7 +11,7 @@
 
 This is the working repo for a 45-minute talk that introduces LLM fundamentals (tokenization, context windows, RAG, schema-constrained output, failure modes) to a clinical/translational psychiatry audience, with two live Colab notebook demos.
 
-Content design (specs, synthetic clinical data, visual assets) is **complete**. What's left is engineering: convert the specs to working `.ipynb` files, verify against the Google AI Studio API, host on GitHub Pages, rehearse.
+Content design (specs, synthetic clinical data, visual assets) is **complete**. What's left is engineering: convert the specs to working `.ipynb` files, verify the local-Phi-3.5 setup runs end-to-end on Colab, host on GitHub Pages, rehearse.
 
 ---
 
@@ -40,7 +40,7 @@ PNG + SVG of each visual; SVG is the source of truth, PNG is for quick mobile pr
 ## What's locked (don't redesign without good reason)
 
 - **Two notebooks**, not one. NB1 = "How LLMs see clinical text" (tokenization, positional encoding, context). NB2 = "Using LLMs for psychiatric research" (RAG, schema extraction, failure modes).
-- **Provider-agnostic `call_llm()` wrapper** with Gemini 2.5 Flash as the default backend (via the free Google AI Studio API — audience can run with a 60-second `GEMINI_API_KEY` setup, no GCP project needed). Commented Claude/OpenAI alternatives. Audience sees this is concept-first, not vendor-promotion.
+- **Provider-agnostic `call_llm()` wrapper** with **Phi-3.5 mini Instruct** (3.8B params, 128K context) as the default backend, running locally on Colab's GPU. No API key, no auth, no setup beyond a 1–2 min model download on first run. Commented Claude/OpenAI/Gemini alternatives. Audience sees this is concept-first, not vendor-promotion — and a small open-source model is *better* for these demos because the failure modes (lost-in-the-middle, hallucination, schema slop) are architecture-level mechanisms that show up more reliably at smaller scale.
 - **Whitfield chart** as the long-context demo content. SSRI-induced SIADH/seizure in 2022 is the documented contraindication; current admission's Plan re-proposes sertraline. ~12,500 words, 28 documents, no in-chart safety catch (max demo teeth).
 - **RAG corpus** = 5 real open-access ketamine/esketamine TRD papers (Berman 2000, Zarate 2006, Murrough 2013, Daly 2018, McIntyre 2021), abstracts to be baked into NB2 as Python strings.
 - **Schema extraction** input = Document 24 of the chart (current admission H&P).
@@ -55,10 +55,10 @@ PNG + SVG of each visual; SVG is the source of truth, PNG is for quick mobile pr
 - ~~Convert NB2_SPEC.md → working `.ipynb`.~~ ✓ Shipped at `notebooks/02_using_llms_for_psychiatric_research.ipynb`.
 - ~~Replace the chart-loading placeholder URL.~~ ✓ Both notebooks point at `raw.githubusercontent.com/.../main/content/whitfield_chart_FULL.md`.
 - ~~Build the GitHub Pages landing page.~~ ✓ Live at `docs/`, served from `https://grosenick-lab-cornell.github.io/sobp-2026-transformers/`.
-- Verify the `google-genai` SDK calls work end-to-end against AI Studio. Especially the structured-output API (`response_schema` with Pydantic) in NB2 §2 — has been volatile across SDK versions. First test: open NB1 in Colab, set `GEMINI_API_KEY`, run.
+- Verify Phi-3.5 mini load + generation work end-to-end on Colab's T4. Especially the `outlines` constrained-generation path in NB2 §2 — `outlines.from_transformers(...)` API has shifted recently; may need a small adjustment. First test: open NB1 in Colab, set runtime to T4 GPU, run all cells.
 
 **Rehearsal-time:**
-- Verify Gemini 2.5 Flash actually fails (or partially fails) on the chart needle question. If it blows through cleanly, escape hatches in `PROJECT_SUMMARY.md` § "Known risks for rehearsal."
+- Verify Phi-3.5 mini fails the needle question in at least one position (start/middle/end), and that the failure pattern is interpretable as lost-in-the-middle rather than just "small model is confused." If it fails too uniformly, the demo loses its punch — rehearsal escape hatches in `PROJECT_SUMMARY.md` § "Known risks for rehearsal."
 - Verify hallucination prompt fails reproducibly in NB2 §1. Three candidate prompts already drafted in NB2_SPEC.md; pick the most reliably-failing one.
 - Decide whether to run NB2's prompt-injection demo live or just discuss in markdown. Cell built, decision deferred.
 

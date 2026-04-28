@@ -79,13 +79,13 @@
 
     <section id="setup">
       <h2>Setup</h2>
-      <p>Both notebooks run on Google's free <strong>AI Studio</strong> tier. No GCP project, no billing, no install — your only setup is a 60-second API key.</p>
+      <p>No API key. No account. No install. The notebooks run <strong>Microsoft Phi-3.5 mini Instruct</strong> (3.8B parameters, 128K context) locally on Colab's free GPU.</p>
       <ol class="setup">
         <li>Click <strong>Open in Colab</strong> on either notebook above.</li>
-        <li>Get a free Gemini API key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com/app/apikey</a>.</li>
-        <li>In Colab, click the 🔑 <strong>Secrets</strong> icon in the left sidebar. Add a new secret named <code>GEMINI_API_KEY</code>, paste your key, and toggle <em>Notebook access</em> on.</li>
-        <li>Run all cells. The free tier covers a full notebook run with room to spare.</li>
+        <li>In Colab, go to <em>Runtime → Change runtime type → T4 GPU</em> if it's not already selected.</li>
+        <li>Run all cells. The first cell downloads the model (~2.3 GB at 4-bit, takes 1–2 minutes); everything after that is fast.</li>
       </ol>
+      <p style="margin-top: 1.5em; font-size: 0.92rem; color: var(--ink-2);"><em>Why a small open-source model rather than GPT or Claude? Because the failure modes we want to demonstrate — lost-in-the-middle, hallucinated citations, schema slop, prompt injection — are mechanisms baked into the transformer architecture. They're present at every scale; frontier models hide them intermittently, not structurally. Running a small model locally makes the demos reliable, the setup zero, and the lessons just as transferable.</em></p>
     </section>
 
     <img class="divider" src="assets/divider_03_squares.svg" alt="">
