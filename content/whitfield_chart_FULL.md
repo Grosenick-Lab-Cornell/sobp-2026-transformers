@@ -180,6 +180,70 @@ She denies hypomanic or manic symptoms ever, denies psychotic features, denies h
 
 ---
 
+## Document 6 — 2022 Progress Note, Hospital Day 2
+
+**Service:** Inpatient Psychiatry, Unit 4-West
+**Provider:** Dr. R. Vanderberg, MD / Resident: Dr. L. Pham, MD
+**Date:** 2022-04-05
+
+**Subjective:** Patient slept ~6 hours with trazodone 50 mg. Appetite 30% of tray at breakfast. Attended morning community meeting. Tearful during check-in. No overnight events per nursing. Passive SI present, no active thoughts since admission.
+
+**Objective:** Vitals stable. T 36.8, HR 74, BP 128/78, weight 66.0 kg. No tremor, alert, oriented. Quiet and withdrawn on rounds but engages when directly addressed.
+
+**Assessment/Plan:**
+1. MDD, severe, recurrent, with SI — initiating sertraline 25 mg PO daily this AM. Fluoxetine will be tapered: decrease fluoxetine to 20 mg daily today, discontinue in 5 days.
+2. Continue trazodone 50 mg QHS.
+3. Daily individual therapy with resident, starting today.
+4. Group therapy x2 today.
+5. Nursing to monitor for serotonin toxicity signs given cross-taper (hyperreflexia, tremor, agitation, clonus, autonomic instability).
+6. Family meeting scheduled for 2022-04-06.
+7. Continue precautions.
+
+**Provider:** L. Pham, MD (resident) / Attending: R. Vanderberg, MD
+
+---
+
+## Document 7 — 2022 Progress Note, Hospital Day 4
+
+**Provider:** L. Pham, MD (resident) / Attending: R. Vanderberg, MD
+**Date:** 2022-04-07
+
+**Subjective:** "A little better, I think." Patient slept 7 hours last night. Appetite improving, ate 60% of lunch yesterday. Participated in CBT group and art group. Reports that the family meeting "helped" — daughter has arranged respite coverage for her husband so Ms. Whitfield can focus on recovery. SI decreased to rare passive ideation, denies current thoughts of self-harm. No adverse effects from medications. No nausea, no GI upset, no tremor, no headache.
+
+**Objective:** Vitals stable. Affect less constricted, briefly smiled in interview. Speech normal rate today. No tremor. No hyperreflexia. Gait steady.
+
+**Assessment/Plan:**
+1. MDD — early subjective improvement, likely nonspecific hospital effect vs. early sertraline response. Tolerating titration well.
+2. **Increase sertraline to 50 mg PO daily today.** Plan titrate to 100 mg by hospital day 7–8.
+3. Decrease fluoxetine to 10 mg daily; discontinue in 2 days.
+4. Continue trazodone 50 mg QHS.
+5. Continue individual and group therapy.
+6. Continue precautions but discuss de-escalation to q30 min if stable through weekend.
+
+---
+
+## Document 8 — 2022 Progress Note, Hospital Day 7
+
+**Provider:** L. Pham, MD (resident) / Attending: R. Vanderberg, MD
+**Date:** 2022-04-10
+
+**Subjective:** Patient reports continued improvement in mood. "I feel more like myself." Slept 7 hours. Appetite returning. She has called her husband daily. She enjoyed occupational therapy group yesterday. Denies SI. Denies HI. No side effects reported — "no nausea, no headaches, nothing." Energy improved.
+
+**Objective:** Weight 65.9 kg (stable). Vitals within normal limits. Affect brighter, fuller range. Speech normal. Thought process linear, future-oriented. MSE otherwise unchanged.
+
+**Labs (routine, scheduled for HD 7):** CBC WNL. **BMP: Na 135 mEq/L (down from 138 on admission), K 4.0, Cl 99, HCO₃ 24, BUN 14, Cr 1.0, glucose 92.** Slight decline in sodium, within normal limits, not flagged by lab. TSH: 1.9. LFTs WNL.
+
+**Assessment/Plan:**
+1. MDD, recurrent, severe — clinical improvement with sertraline 50 mg. Will titrate to 100 mg today per plan. Fluoxetine now discontinued for 2 days. Patient tolerating cross-taper without evidence of serotonin toxicity.
+2. **Increase sertraline to 100 mg PO daily today.**
+3. Continue trazodone 50 mg QHS PRN.
+4. Sodium 135 noted — within normal limits, not currently concerning in an asymptomatic patient; will recheck in 3–4 days given she is on an SSRI in the context of age and CKD.
+5. De-escalate to q30 min checks.
+6. Continue therapy plan.
+7. Begin discharge planning. Target discharge HD 10–12 if trajectory continues.
+
+---
+
 ## Document 9 — 2022 Progress Note, Hospital Day 9 (Morning)
 
 **Provider:** L. Pham, MD (resident)
@@ -431,6 +495,95 @@ She has had a repeat BMP on 2022-05-04 — sodium 137, creatinine 1.0, otherwise
 
 ---
 
+## Document 14 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2022-08-09
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** The patient returns for follow-up 3 months after her prior visit. She has now been on bupropion XL 300 mg daily for approximately 2.5 months. She reports a reasonable mood — "not great, not bad." She has returned to teaching part-time (summer session), attends her bridge group when she can, and continues to care for her husband, who completed 6 cycles of FOLFIRINOX in July with mixed response; his oncology team is considering second-line therapy vs. best supportive care. This has been a source of anticipatory grief.
+
+No SI. Sleep adequate with occasional trazodone use (2–3 nights per week). Weight stable at 64.5 kg. Energy "enough."
+
+**Repeat BMP 2022-07-10:** Sodium 138, creatinine 1.0. Unchanged.
+**Outpatient EEG (2022-05-24) result:** Normal background, no epileptiform activity. As expected per Neurology.
+
+**MSE:** Pleasant, euthymic-range affect, linear thought, no SI/HI.
+
+**Assessment:** MDD, recurrent, in sustained partial remission on bupropion 300 mg. GAD quiescent. Stable. Continues in grief-related processing with therapy.
+
+**Plan:**
+1. Continue bupropion XL 300 mg daily.
+2. Continue trazodone 50 mg QHS PRN.
+3. Continue CBT.
+4. Follow-up in 3 months.
+5. **SSRI caution remains in effect. Documented.**
+
+---
+
+## Document 15 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2023-04-11
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Ms. Whitfield returns for routine follow-up. Notable changes since last visit:
+- Her husband completed a course of second-line chemotherapy in December 2022. Disease progression was documented in February 2023 and he has transitioned to best supportive care / home hospice.
+- She has been his primary caregiver through this.
+- Her mood has held up better than she expected. She attributes this to medication ("this one has been good to me"), therapy, her daughter's support, and a sense of "doing meaningful work" caring for her husband.
+- She reports occasional tearfulness related to grief, which she views as appropriate.
+- She has retired fully from teaching (end of 2022 school year).
+
+Sleep 6 hours average, appetite stable, weight 64 kg, no SI/HI, no new medical issues. Bupropion XL 300 mg tolerated well. No adverse effects. No further seizure activity. Last BMP 2023-02-02: Na 139, Cr 1.1.
+
+**MSE:** Pleasant, appropriate affect given circumstances, mood "okay for what's happening," linear thought, no SI.
+
+**Assessment:** MDD in stable remission on bupropion. Anticipatory grief, managed effectively with therapy and social support. Prior severe ADR remains documented.
+
+**Plan:** Continue current regimen. Follow-up in 6 months, sooner if husband's status changes. Continue CBT.
+
+---
+
+## Document 16 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2023-10-05
+**Visit type:** Follow-up, 45 minutes
+
+**Interval:** The patient's husband has had a difficult several months. He has been on home hospice since March 2023 and the oncology team initially estimated weeks to a few months of life; he is now 7 months into hospice care and still at home, though progressively weaker. Ms. Whitfield describes the duration of his illness as "surreal." She continues to be his primary caregiver with daily nurse visits.
+
+She reports mood is "tired but not depressed." She is sleeping 6 hours with occasional trazodone use. Weight 63.8 kg. Appetite fair. She has started occasionally attending her church again on Sundays when a family member can stay with her husband. She denies SI/HI.
+
+Medications: bupropion XL 300 mg daily, trazodone 50 mg QHS PRN, amlodipine, atorvastatin, calcium + D3. No new medications.
+
+**MSE:** Tired-appearing, affect reactive and appropriate, mood "fatigued but okay," no SI/HI, linear thought.
+
+**Assessment:** MDD in remission. Prolonged anticipatory grief. Caregiver burden significant. Medication regimen stable.
+
+**Plan:** Continue current meds. Encourage self-care. Maintain therapy. 3-month follow-up, sooner as needed.
+
+---
+
+## Document 17 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2024-02-20
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Her husband remains at home on hospice. His disease has progressed slowly and he is now largely bed-bound. Ms. Whitfield's daughter and son-in-law are rotating with her in caregiving. Her grandson Noah (now age 3) visits weekly. Ms. Whitfield reports "small joys in between the grief."
+
+She has had one mild cold this winter. No new medical issues. Labs 2024-01: Na 138, Cr 1.1 (stable CKD).
+
+Mood stable. Sleep 6 hours. Weight 63 kg. No SI. Denies alcohol beyond the occasional glass of wine with dinner (1–2 times weekly).
+
+**MSE:** Appropriate, fuller affect today, mood "holding," no SI/HI.
+
+**Assessment:** MDD in sustained remission on bupropion. Significant ongoing caregiver role.
+
+**Plan:** Continue bupropion 300 mg daily. Continue trazodone PRN. Continue CBT. 4-month follow-up.
+
+---
+
 ## Document 18 — Outpatient Psychiatry Note
 
 **Provider:** Dr. M. Halvorsen, MD
@@ -456,6 +609,86 @@ She is not asking for medication changes. She reports good tolerance of bupropio
 4. Anticipatory guidance regarding the first year of grief — difficult dates, anniversary, holidays. We discussed these openly.
 5. Short-interval follow-up — 4 weeks.
 6. Reassure patient that if grief shifts toward a depressive episode we will recognize it and treat proactively.
+
+---
+
+## Document 19 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2025-03-14
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Patient has been doing reasonably well over the past 6 months since her last urgent visit in September. She describes the winter as "hard in expected ways" — she found holidays difficult, she cried on her husband's birthday in November and on their wedding anniversary in January, but she has not had prolonged depressive symptoms. She has re-engaged with her bridge group, resumed regular church attendance, and been spending substantial time with her grandson (now 4 years old). She has completed significant grief work with Dr. Pereira.
+
+She has had no new medical issues. Recent labs 2025-02-10: Na 138, K 4.2, Cr 1.1 (eGFR 58, stable stage 2 CKD), TSH 2.0.
+
+Sleep has largely returned to baseline. Weight 63.5 kg. Appetite good. No SI. No HI.
+
+Continues on bupropion XL 300 mg daily, trazodone 50 mg QHS PRN (now used 1–2 nights weekly), home medications for HTN and HLD.
+
+**MSE:** Pleasant, appropriate affect, mood "okay," linear thought, no SI/HI.
+
+**Assessment:** MDD in sustained remission. Grief trajectory appropriate. No acute issues.
+
+**Plan:** Continue current regimen. 4-month follow-up. Will proactively check in via portal around 1-year anniversary of husband's death (September 2025).
+
+---
+
+## Document 20 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2025-07-01
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Patient returns for routine follow-up. She reports mood has been "mostly okay" since March but with an increasing sense of dread as the 1-year anniversary of her husband's death approaches in September. She describes more frequent tearfulness over the past 3 weeks, some early morning awakening 2–3 times per week, and a mild decrease in her usual activities. She has continued bridge and church but has been less engaged. Appetite is good. No weight loss. She specifically denies current depressive episode criteria — her mood is reactive, she has not lost interest, she has not become hopeless, she has no SI.
+
+Medications unchanged. No side effects.
+
+**MSE:** Slight constriction of affect compared to March, but reactive. Pleasant. Mood "bracing." No SI/HI. Insight and judgment intact.
+
+**Assessment:** Subsyndromal anticipatory anniversary reaction, not meeting criteria for depressive episode. At elevated risk for recurrence given upcoming anniversary.
+
+**Plan:**
+1. Continue current medications.
+2. Increase therapy frequency temporarily to every 2 weeks for next 3 months, coordinated with Dr. Pereira.
+3. Safety plan reviewed.
+4. Follow-up in 6 weeks (planned: mid-August, just before anniversary).
+5. Patient knows to contact earlier if worsening.
+6. Encouraged continued social engagement.
+
+---
+
+## Document 21 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2025-08-28
+**Visit type:** Follow-up, 45 minutes
+
+**Interval:** Patient presents and reports significant worsening over the past 4 weeks. The anniversary of her husband's death is now approximately 12 days away (2025-09-09). She describes mood as "very low, most of the day, every day," with daily tearfulness, early morning awakening at 0330, weight loss of 8 pounds in 6 weeks (now 59 kg, down from 64 kg in March), profound anhedonia — she has dropped out of bridge and has not attended church in 3 weeks. She endorses feelings of worthlessness and guilt ("I should have done more for Art when he was sick"). She is sleeping poorly despite increasing trazodone to nightly.
+
+She endorses passive SI — "it would be easier if I weren't here" — present for approximately 2 weeks. She denies a plan, denies intent, denies gathering means. She denies active ideation today. No HI. No psychosis.
+
+She has continued bupropion XL 300 mg daily — adherence confirmed by her daughter. No side effects. She has been seeing Dr. Pereira every 2 weeks as planned and reports therapy is "helping hold the line but not enough."
+
+No recent medical illness, no new medications, no changes in medical regimen.
+
+**MSE:** Thin, paler, more tired-appearing than at last visit. Affect constricted, tearful multiple times during visit. Mood "sinking." Speech somewhat slowed. Linear thought process, some rumination about her caregiving of her husband. Passive SI as described, no plan, no intent, no active ideation. No psychotic features. Cognition grossly intact (MOCA screener 27/30 in office). Insight good. Judgment fair.
+
+**Assessment:** **Emerging major depressive episode, recurrent, moderate to severe, in the setting of approaching anniversary reaction and anticipatory grief, superimposed on baseline remission on bupropion. Now with passive suicidal ideation.** This is meeting DSM-5 criteria for a depressive episode and is progressing quickly.
+
+**Plan:**
+1. **Escalation of care warranted.** Discussed options with patient:
+   - Inpatient admission (patient declines; states she does not currently have active ideation with plan/intent and wishes to try outpatient escalation first)
+   - Partial hospitalization — patient would accept if available
+   - Intensive outpatient — patient accepts
+   - Medication adjustment
+2. **Pharmacologic plan:** Continue bupropion 300 mg. **Critical consideration: patient has documented severe SSRI reaction (SIADH with seizure, 2022) and SSRIs remain contraindicated for this patient. Alternative options considered: addition of mirtazapine (risk of sedation and weight gain, though she has lost weight so weight gain may be acceptable), addition of vortioxetine (with caution given partial serotonergic mechanism and need for sodium monitoring), or SNRI (with caution regarding SIADH risk). Also reasonable: augmentation with lithium (she previously declined given CKD), or augmentation with low-dose aripiprazole. Non-pharmacologic: ECT referral to be discussed at next visit if trajectory continues to worsen.**
+3. **I have recommended adding mirtazapine 15 mg QHS** — benefits include improvement of sleep, appetite, weight, and anxiety; sedation is acceptable at QHS dosing; lower SIADH risk than SSRIs. She has agreed to try this. Will start tonight.
+4. Safety plan updated. Daughter has removed home medications (she has continued this practice since 2022).
+5. **Follow-up in 5 days.** If no improvement or worsening, plan for PHP or inpatient.
+6. Therapy frequency increased to weekly with Dr. Pereira.
+7. Crisis line provided. After-hours number provided.
+8. **SSRI CONTRAINDICATION REAFFIRMED AND DOCUMENTED.**
 
 ---
 
@@ -524,12 +757,12 @@ On ED evaluation, Ms. Whitfield is quiet, cooperative, slightly hunched, tearful
 |---|---|---|---|---|---|
 | 1 | Penicillin | Rash | Mild | childhood | Avoid; not formally re-tested |
 | 2 | Sulfa drugs | Rash | Mild | remote | Avoid |
-| 3 | **Sertraline** | **SIADH / hyponatremia (Na 122) / generalized tonic-clonic seizure** | **SEVERE** | **2022** | **DO NOT ADMINISTER. Class-level caution — avoid all SSRIs. Documented and reaffirmed by Neurology 2022; reaffirmed by outpatient psychiatrist 2025-08-28.** |
+| 3 | Antidepressant intolerance | Adverse reaction during 2022 inpatient trial | Documented | 2022 | See PPH and 2022 discharge summary for full details |
 
 ---
 
 **PATIENT EDUCATION ON ADMISSION:**
-Ms. Whitfield's medications were reviewed with her and her daughter. Both confirm the above list is complete. Both are aware of the sertraline severe adverse reaction and both independently stated "she cannot take SSRIs" during the reconciliation interview. Daughter explicitly requested this be flagged to the inpatient team.
+Ms. Whitfield's medications were reviewed with her and her daughter. Both confirm the above list is complete. Both are aware of her past adverse medication reaction and the relevant clinical history is documented in prior records (see PPH and 2022 discharge summary).
 
 **Verified by:** M. Okafor, RN / L. Kim, MD
 **Timestamp:** 2025-09-03, 14:25
@@ -568,7 +801,7 @@ Outpatient psychotherapy (CBT-focused) has been ongoing at approximately monthly
 
 No recent medical illnesses, surgeries, head injuries, or travel. No changes in medications for her comorbid conditions (see Past Medical History). No recent alcohol or substance use per the patient and corroborated by her daughter. She denies recent changes in sodium-containing medications, diuretic use, or fluid intake pattern changes.
 
-Of note, she volunteered during the ED evaluation that she is "terrified" of being put back on any SSRI, stating "the last time I was on one I almost died." Further details are obtained in the Past Psychiatric History below and were confirmed via review of outside records.
+Of note, she volunteered during the ED evaluation that she is "terrified" of being put back on "those medications," stating "the last time I was on one I almost died." Further details are obtained in the Past Psychiatric History below and were confirmed via review of outside records.
 
 ---
 
@@ -580,7 +813,7 @@ She has had **two prior psychiatric hospitalizations**.
 
 The first was in approximately 2009 at an outside facility (records limited, patient history) for a depressive episode with passive suicidal ideation following a reduction in her job responsibilities. She was treated with fluoxetine, which she tolerated reasonably and to which she responded partially. She remained on fluoxetine for roughly two years and was subsequently tapered off during a period of remission.
 
-The second hospitalization was in **April 2022** at [synthetic hospital], lasting 11 days, for a severe depressive episode precipitated by her husband's cancer diagnosis. She was admitted after presenting to her outpatient psychiatrist with active suicidal ideation. On that admission she was initiated on **sertraline 25 mg daily, titrated to 50 mg on hospital day 3 and 100 mg on hospital day 7**. On hospital day 9 she was noted by nursing to be increasingly confused, with a headache, nausea, and mild gait unsteadiness. Morning labs that day revealed **serum sodium of 124 mEq/L** (baseline 138 mEq/L on admission), consistent with SIADH. Later that same afternoon she had a **witnessed generalized tonic-clonic seizure** lasting approximately 90 seconds, with postictal confusion and mild tongue laceration. Sertraline was discontinued immediately. She was transferred to the medical service for 48 hours, where she was managed with fluid restriction and her sodium corrected gradually to 136 mEq/L over three days without further sequelae. Neurology consultation attributed the seizure to SSRI-induced hyponatremia; no further seizures occurred, a non-contrast head CT was unremarkable, and outpatient EEG approximately one month post-discharge was normal. She was discharged from her inpatient stay on **bupropion XL 150 mg daily** (later titrated to 300 mg as an outpatient), which she has continued since. Per both the patient and her daughter, this reaction was discussed extensively at that admission; her medication allergy/intolerance list should reflect "SSRI-induced hyponatremia with seizure, sertraline 2022" and she has been counseled by multiple providers to avoid SSRIs as a class going forward given her age and the severity of the reaction.
+The second hospitalization was in **April 2022** at [synthetic hospital], lasting 11 days, for a severe depressive episode precipitated by her husband's cancer diagnosis. She was admitted after presenting to her outpatient psychiatrist with active suicidal ideation. The hospital course was complicated by a documented adverse medication reaction during the inpatient trial, requiring temporary transfer to the medical service for approximately 48 hours; she recovered fully without further sequelae. The full clinical details of the agent involved, the metabolic abnormality, and the associated neurological event are documented in the 2022 discharge summary (this chart, Document 12). She was discharged on **bupropion XL 150 mg daily** (later titrated to 300 mg as an outpatient), which she has continued since. Per both the patient and her daughter, the responsible medication and the reaction were discussed extensively at that admission, and she has been counseled by multiple providers to avoid that medication and its class going forward.
 
 Between hospitalizations she has been followed continuously in outpatient care. Prior antidepressant trials include fluoxetine (partial response, tolerated), citalopram (brief trial ~2015, discontinued for GI side effects after 3 weeks, never re-tried), mirtazapine (brief trial ~2018, discontinued due to excessive sedation and weight gain), and bupropion (current, see above). She has not had a trial of an SNRI, a tricyclic, vortioxetine, or an MAOI. She has never received ECT or TMS. Lithium augmentation has been discussed in the past but she declined given concern about long-term renal effects in the context of her chronic kidney disease (stage 2, see PMH).
 
@@ -605,7 +838,7 @@ Prior self-harm: none. Prior suicide attempts: none.
 **ALLERGIES / ADVERSE REACTIONS**
 
 - Penicillin — rash as a child (not re-challenged)
-- **Sertraline — SIADH with hyponatremia and generalized seizure, 2022 hospitalization (see PPH)**
+- **Antidepressant intolerance, 2022 (see PPH and 2022 discharge summary, Document 12)**
 - Sulfa — documented rash, avoids
 - No known food allergies
 
@@ -729,3 +962,93 @@ She is presently treatment-incomplete — she has had adequate trials of fluoxet
 8. Family meeting with daughter planned for hospital day 2.
 
 ---
+
+## Document 25 — Current Admission Progress Note — Hospital Day 1
+
+**Provider:** J. Carter, MD (PGY-3 Resident) / Attending: Dr. N. Raskin, MD
+**Date:** 2025-09-04, 07:20
+
+**Subjective:** Patient slept approximately 5 hours with home-dose trazodone. Ate 25% of breakfast tray. Quiet during morning check-in, tearful when asked about her husband. Denies overnight events. Passive SI present, endorses "one moment" around 0400 where she "wished she wouldn't wake up," no active thoughts since then. Cooperative.
+
+**Objective:** T 36.7, HR 72, BP 126/76, RR 14, weight 58.0 kg (stable). Thin, tired-appearing. MSE: quiet, constricted affect, mood "low," linear thought, passive SI, no HI, no psychotic features, cognition intact.
+
+**Assessment/Plan:**
+1. Severe recurrent MDD with suicidal ideation — hospital day 1.
+2. Continue pharmacologic plan per admission H&P.
+3. Continue precautions q15 min.
+4. Daily individual therapy, group therapy.
+5. Family meeting scheduled HD 2 with daughter.
+6. Repeat BMP in 5 days.
+7. Social work consult for post-discharge planning.
+
+---
+
+## Document 26 — Current Admission Progress Note — Hospital Day 2
+
+**Provider:** J. Carter, MD (PGY-3 Resident)
+**Date:** 2025-09-05, 07:15
+
+**Subjective:** Patient slept 6 hours. Ate 50% of dinner last night, 30% of breakfast. Attended morning community group. Family meeting this afternoon with daughter at 14:00. Patient reports mood "a little less heavy" today. No active SI overnight. Denies HI.
+
+**Objective:** Vitals stable. MSE unchanged from HD1.
+
+**Assessment/Plan:**
+1. MDD, severe — hospital day 2. Early stabilization.
+2. Continue current pharmacologic regimen.
+3. Continue trazodone PRN.
+4. Family meeting this afternoon.
+5. Continue precautions.
+
+---
+
+## Document 27 — Current Admission Social Work Note — Hospital Day 1
+
+**Provider:** M. Ingalls, LCSW
+**Date:** 2025-09-04, 15:30
+
+**Reason for consult:** Psychosocial assessment; discharge planning.
+
+Met with patient and with her daughter (Caroline Whitfield, 35, lives 20 minutes from patient, married, works as elementary school teacher, one son age 4). Patient cooperative, thoughtful. Tearful throughout portions of conversation.
+
+**Living situation:** Patient lives alone in the single-family home she and her husband owned for 32 years. Home is paid off. Patient has no difficulty with ADLs or IADLs. She drives, manages her own finances, prepares her own meals when well. No home health services at this time.
+
+**Financial:** Retirement pension, Social Security, savings. No financial stress. Health insurance through Medicare + supplemental plan.
+
+**Social support:** Daughter is primary support, visits weekly, calls daily. Daughter and son-in-law have been expressing increasing concern about mother living alone, particularly since the current episode began in July. Church community is active and visits regularly. Former colleagues maintain some contact. Bridge group had been a substantial social outlet but patient has withdrawn from this.
+
+**Mood/Risk assessment for social work purposes:** Patient endorses grief and depression. Expresses a wish that her husband were still alive but denies active desire to join him by self-harm. Recognizes the impact of her potential death on her daughter and grandson as a protective factor.
+
+**Discharge planning discussion:**
+- Patient would prefer to return to her own home post-discharge.
+- Daughter is proposing that mother move in with their family, at least temporarily.
+- A middle option of daughter staying overnight in patient's home several nights per week is also being discussed.
+- Patient would benefit from a structured step-down program (PHP or IOP) after this admission.
+- Home safety: daughter continues to secure medications and confirms no firearms in home.
+
+**Plan:**
+1. Will revisit disposition options with patient as admission progresses.
+2. Explore PHP programs in her catchment area.
+3. Reinforce community supports (church, bridge club, therapy).
+4. Family meeting today at 14:00 with psychiatry team.
+
+---
+
+## Document 28 — Nursing Shift Note — Hospital Day 1 (Night Shift)
+
+**Provider:** D. Aguilar, RN
+**Date/Shift:** 2025-09-03/04, 23:00–07:00
+**Unit:** 4-West, Room 412
+
+**Assessment:** Patient on admission day 1, q15 min observation. Oriented x4, cooperative with admission process, all belongings searched and returned minus prohibited items. Ate 40% of dinner tray. Took evening medications as ordered (bupropion held to AM per order set, mirtazapine 15 mg QHS given, trazodone 50 mg PRN given at patient's request at 21:30). Vital signs stable on evening check.
+
+Patient noted to be tearful around 2200 when her daughter departed. She was offered support, accepted a brief conversation with this nurse, then requested to go to bed. Asleep by 2315 per q15 checks.
+
+Awake and restless 0415–0500, observed sitting up in bed. Declined PRN medications, stated "I just can't sleep." Conversation with patient — she endorses low mood and passive SI of the type she reported at admission, denies active thoughts, denies plan or intent. She declines to speak with on-call provider; requests to try to rest. She returned to bed and slept intermittently until morning.
+
+No falls. No attempts at self-harm. No concerning behaviors observed. Precautions maintained throughout shift.
+
+**D. Aguilar, RN, BSN**
+
+---
+
+# END OF CHART

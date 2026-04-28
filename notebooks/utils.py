@@ -1,10 +1,17 @@
 """Helpers for the SOBP 2026 LLM-Basics talk notebooks.
 
 Imported by both NB1 and NB2 setup cells. Designed for fast iteration:
-notebooks pull this file via `git pull` + `%autoreload 2` so changes here
-propagate without re-loading the model (which is the slow part).
+notebooks pull this file via `git pull` so changes here propagate
+without re-loading the model (which is the slow part).
 """
 from __future__ import annotations
+
+import os
+
+# Set the CUDA allocator config before torch initializes its CUDA backend.
+# `expandable_segments:True` reduces fragmentation, which matters for the
+# §4 long-chart needle demo (17K-token forward passes on Colab T4).
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
