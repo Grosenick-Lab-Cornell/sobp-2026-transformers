@@ -77,7 +77,19 @@ def call_llm(prompt: str, *, model, tokenizer, system: str | None = None,
     )
 
 
+def _free_cuda_memory():
+    """Clear CUDA cache + run gc. Cheap (~ms), prevents fragmentation
+    accumulating across long-context calls (matters for the §4 needle
+    demo which runs the model 3x sequentially on a multi-thousand-token
+    prompt)."""
+    import gc
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
+
 def _generate_text(prompt_text, *, model, tokenizer, max_new_tokens):
+    _free_cuda_memory()
     inputs = tokenizer(prompt_text, return_tensors="pt").to(model.device)
     with torch.no_grad():
         output_ids = model.generate(
@@ -90,6 +102,10 @@ def _generate_text(prompt_text, *, model, tokenizer, max_new_tokens):
         output_ids[0][inputs.input_ids.shape[1]:],
         skip_special_tokens=True,
     )
+    # Free the input tensors and output ids to reduce peak memory before
+    # the next call. The decoded string is what we actually return.
+    del inputs, output_ids
+    _free_cuda_memory()
     return response.strip()
 
 
