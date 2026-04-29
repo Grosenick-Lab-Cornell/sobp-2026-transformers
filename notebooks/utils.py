@@ -119,8 +119,13 @@ def _generate_text(prompt_text, *, model, tokenizer, max_new_tokens):
 def _generate_schema(prompt_text, *, model, tokenizer, response_schema,
                      max_new_tokens):
     """Constrained generation via outlines. Guarantees valid JSON matching
-    the schema, parsed into the corresponding Pydantic instance."""
+    the schema, parsed into a Python dict.
+
+    Recent outlines versions return a JSON string rather than a Pydantic
+    instance; we json.loads the string so the notebook always sees a dict.
+    """
     import outlines
+    import json as _json
 
     key = (id(model), id(tokenizer))
     if key not in _OUTLINES_CACHE:
@@ -130,4 +135,8 @@ def _generate_schema(prompt_text, *, model, tokenizer, response_schema,
     result = outlines_model(
         prompt_text, response_schema, max_new_tokens=max_new_tokens,
     )
-    return result.model_dump() if hasattr(result, "model_dump") else result
+    if hasattr(result, "model_dump"):
+        return result.model_dump()
+    if isinstance(result, str):
+        return _json.loads(result)
+    return result
