@@ -79,6 +79,28 @@ section { padding: 1.25rem 0 2rem; }
   max-width: 70ch;
 }
 
+/* ─── setup steps ───────────────────────────────────────────────────── */
+.setup {
+  max-width: 70ch;
+  margin: 0 auto;
+}
+.setup h2 {
+  font-size: 0.85rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--teal-bright);
+  margin: 0 0 0.7em;
+  font-weight: 500;
+}
+.setup ol {
+  margin: 0;
+  padding-left: 1.4em;
+  color: var(--ink);
+  font-size: 1.0rem;
+}
+.setup ol li { margin: 0.4em 0; }
+
 /* ─── notebook cards ────────────────────────────────────────────────── */
 .cards {
   display: grid;
@@ -996,6 +1018,15 @@ footer a:hover, footer a:focus { color: var(--ink); }
 
   <section class="abstract" aria-label="Abstract">
     <p>Intro to LLMs for psychiatric research: tokenization, positional encoding, context, retrieval, and structured output. Two Colab notebooks demonstrate each on a small open-source model (Phi-3.5 mini) running locally. No API keys, no accounts.</p>
+  </section>
+
+  <section class="setup" aria-label="Setup">
+    <h2>Before you run</h2>
+    <ol>
+      <li>Click <strong>Open in Colab</strong> on either notebook below.</li>
+      <li>In Colab, switch to a GPU runtime: <strong>Runtime &rarr; Change runtime type &rarr; T4 GPU</strong>.</li>
+      <li><strong>Run all cells.</strong> The first setup cell installs dependencies and downloads the model (about 1 to 2 minutes on a T4); subsequent cells run in seconds.</li>
+    </ol>
   </section>
 
   <section class="notebooks" aria-label="Notebooks">
