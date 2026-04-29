@@ -157,11 +157,22 @@ def cached_call_llm(label: str, prompt: str | None = None, *,
             f"requires `prompt`, `model`, and `tokenizer`."
         )
     print(f"[cache miss for {label!r}; running model live]")
-    return call_llm(
+    result = call_llm(
         prompt, model=model, tokenizer=tokenizer,
         system=system, max_new_tokens=max_new_tokens,
         response_schema=response_schema,
     )
+    # Print so the user actually sees the live result (parity with cache-hit
+    # path, which streams chars). Also auto-save to the JSON cache so the
+    # next run replays deterministically; delete the label from
+    # content/cached_outputs.json (or pass rerun=True) to regenerate.
+    if isinstance(result, str):
+        print(_wrap_for_display(result, width=display_width))
+        save_to_cache(label, result)
+        print(f"[saved to cache as {label!r}]")
+    else:
+        print(result)
+    return result
 
 
 def save_to_cache(label: str, text: str) -> None:
