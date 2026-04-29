@@ -95,16 +95,41 @@ def _free_cuda_memory():
         torch.cuda.empty_cache()
 
 
+def _build_quantized_cache_config():
+    """Return a 4-bit KV-cache config if quanto is available, else None.
+
+    The KV cache dominates GPU memory at long context lengths (32 layers
+    times 2 K/V times sequence length times hidden dim times bytes-per-
+    element). On a 16 GB T4, full-precision KV cache for the ~25K-token
+    chart already exceeds capacity. Quantizing to 4 bits brings the cache
+    from ~9.4 GB to ~2.4 GB and makes the §4 calls fit.
+    """
+    try:
+        from transformers import QuantizedCacheConfig
+        # Side-effect: confirm quanto is actually importable.
+        import optimum.quanto  # noqa: F401
+        return QuantizedCacheConfig(backend="quanto", nbits=4)
+    except ImportError:
+        return None
+
+
 def _generate_text(prompt_text, *, model, tokenizer, max_new_tokens):
     _free_cuda_memory()
     inputs = tokenizer(prompt_text, return_tensors="pt").to(model.device)
+
+    gen_kwargs = dict(
+        **inputs,
+        max_new_tokens=max_new_tokens,
+        do_sample=False,
+        pad_token_id=tokenizer.eos_token_id,
+    )
+    cache_config = _build_quantized_cache_config()
+    if cache_config is not None:
+        gen_kwargs["cache_implementation"] = "quantized"
+        gen_kwargs["cache_config"] = cache_config
+
     with torch.no_grad():
-        output_ids = model.generate(
-            **inputs,
-            max_new_tokens=max_new_tokens,
-            do_sample=False,
-            pad_token_id=tokenizer.eos_token_id,
-        )
+        output_ids = model.generate(**gen_kwargs)
     response = tokenizer.decode(
         output_ids[0][inputs.input_ids.shape[1]:],
         skip_special_tokens=True,
