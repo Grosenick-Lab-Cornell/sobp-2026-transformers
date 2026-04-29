@@ -30,7 +30,7 @@ from pathlib import Path
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
-MODEL_NAME = "unsloth/Phi-3.5-mini-instruct-bnb-4bit"
+MODEL_NAME = "microsoft/Phi-3.5-mini-instruct"
 
 _OUTLINES_CACHE: dict = {}
 _OUTPUT_CACHE: dict | None = None
