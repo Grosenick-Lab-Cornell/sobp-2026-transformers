@@ -45,7 +45,6 @@ notebooks/    runnable Colab notebooks + utils.py
 content/      synthetic Whitfield chart, cached model outputs
 visuals/      header, dividers, conceptual diagrams (PNG + SVG)
 docs/         GitHub Pages landing page
-specs/        cell-by-cell design notes for each notebook
 ```
 
 All clinical content is fully synthetic. No real patient data, even de-identified.

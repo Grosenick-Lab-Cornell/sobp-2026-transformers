@@ -71,3 +71,9 @@ secrets.json
 # canonical artifacts.
 CLAUDE.md
 .claude/
+
+# ─── Design notes / pre-build specs ──────────────────────────
+# Internal cell-by-cell design notes from the chat-side phase.
+# Useful as historical context locally; not part of what users
+# need from the repo.
+specs/
