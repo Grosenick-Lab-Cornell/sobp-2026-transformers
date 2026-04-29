@@ -15,11 +15,10 @@
     </style>
   </defs>
 
-  <rect width="1200" height="740" fill="#1e1e1e"/>
+  <rect width="1200" height="740" fill="#292A2C"/>
 
   <text x="60" y="65" class="hand">a long chart, in context:</text>
 
-  <!-- LEFT: chart silhouette with a teal needle highlighted -->
   <g id="chart">
     <path class="ink"
           d="M 200 110 Q 200 105, 210 105 L 395 107 Q 405 107, 405 113
@@ -113,7 +112,6 @@
     <line class="ink-thin" x1="305" y1="578" x2="327" y2="578" stroke-width="1.2"/>
     <line class="ink-thin" x1="335" y1="578" x2="387" y2="578" stroke-width="1.2"/>
 
-    <!-- Needle: teal-tinted band -->
     <rect x="206" y="318" width="198" height="62"
           fill="#06B6D4" fill-opacity="0.22"
           stroke="#06B6D4" stroke-width="2.5" rx="3"/>
@@ -123,12 +121,15 @@
     <line class="accent-thin" x1="215" y1="374" x2="320" y2="374" stroke-width="1.5"/>
   </g>
 
-  <text x="200" y="640" class="hand-small">Eleanor's chart - 28 documents, ~12.5k words</text>
+  <text x="200" y="640" class="hand-small">Eleanor's chart, 28 documents, ~12.5k words</text>
 
-  <!-- MIDDLE: attention-density gauge -->
   <g id="attention-curve">
     <path class="ink-thin" d="M 480 110 L 480 605"/>
-    <text x="475" y="93" class="hand-small" font-size="26">attention →</text>
+    <text x="475" y="93" class="hand-small" font-size="26">attention</text>
+    <!-- Small ink arrow next to "attention" label, pointing right -->
+    <path stroke="#9CA3AF" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          d="M 600 85 L 638 85"/>
+    <path fill="#9CA3AF" d="M 632 80 L 642 85 L 632 90 Z"/>
     <line class="ink-thin" x1="480" y1="115.0" x2="599.5" y2="115.0" stroke-width="1.4"/>
     <line class="ink-thin" x1="480" y1="122.0" x2="590.8" y2="122.0" stroke-width="1.4"/>
     <line class="ink-thin" x1="480" y1="129.1" x2="591.7" y2="129.1" stroke-width="1.4"/>
@@ -205,19 +206,17 @@
              C 488 440, 540 510, 590 600"/>
   </g>
 
-  <text x="615" y="135" class="hand-small">dense - model attends</text>
-  <text x="615" y="615" class="hand-small">dense - model attends</text>
+  <text x="615" y="135" class="hand-small">dense, model attends</text>
+  <text x="615" y="615" class="hand-small">dense, model attends</text>
 
-  <!-- Arrow from middle of attention curve to needle in chart -->
   <path class="accent" d="M 484 350 C 460 350, 440 348, 410 350"/>
   <path class="accent-fill" d="M 414 343 L 402 350 L 414 357 Z"/>
 
-  <!-- Big teal callout, top-right -->
-  <text x="700" y="290" class="hand-teal">it's in the chart -</text>
+  <text x="700" y="290" class="hand-teal">it's in the chart,</text>
   <text x="700" y="340" class="hand-teal">but the model's</text>
   <text x="700" y="390" class="hand-teal">attention isn't.</text>
 
-  <text x="60" y="652" class="hand-small" font-size="22">"lost in the middle" - Liu et al., 2023.</text>
+  <text x="60" y="652" class="hand-small" font-size="22">"lost in the middle", Liu et al., 2023.</text>
   <text x="60" y="678" class="hand-small" font-size="22">simple retrieval has largely been solved on frontier models (2025);</text>
   <text x="60" y="704" class="hand-small" font-size="22">multi-hop integration &amp; conflict-detection across long context remains affected.</text>
 
