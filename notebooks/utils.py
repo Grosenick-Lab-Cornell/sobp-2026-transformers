@@ -96,21 +96,42 @@ def _free_cuda_memory():
 
 
 def _build_quantized_cache_config():
-    """Return a 4-bit KV-cache config if quanto is available, else None.
+    """Return a 4-bit KV-cache config if quanto is fully usable, else None.
 
-    The KV cache dominates GPU memory at long context lengths (32 layers
-    times 2 K/V times sequence length times hidden dim times bytes-per-
-    element). On a 16 GB T4, full-precision KV cache for the ~25K-token
-    chart already exceeds capacity. Quantizing to 4 bits brings the cache
-    from ~9.4 GB to ~2.4 GB and makes the §4 calls fit.
+    Tests not just basic imports but the specific quanto API
+    (`qint4`) that transformers' QuantoQuantizedCache calls internally.
+    Catches optimum-quanto / transformers version mismatches that
+    would otherwise pass `from optimum.quanto import ...` cleanly but
+    fail at cache-init time.
     """
     try:
         from transformers import QuantizedCacheConfig
-        # Side-effect: confirm quanto is actually importable.
-        import optimum.quanto  # noqa: F401
+        from optimum.quanto import qint4  # noqa: F401
         return QuantizedCacheConfig(backend="quanto", nbits=4)
-    except ImportError:
+    except (ImportError, ModuleNotFoundError, AttributeError):
         return None
+
+
+def kv_cache_status() -> str:
+    """Return 'ENABLED (4-bit, quanto)' or a one-line reason it isn't.
+
+    Public-facing: setup cells print this so you can see at runtime
+    whether long-context calls will actually use the quantized cache.
+    """
+    cfg = _build_quantized_cache_config()
+    if cfg is not None:
+        return "ENABLED (4-bit, quanto backend)"
+    # Diagnose the specific reason.
+    try:
+        from transformers import QuantizedCacheConfig  # noqa: F401
+    except ImportError:
+        return "DISABLED (transformers does not expose QuantizedCacheConfig)"
+    try:
+        from optimum.quanto import qint4  # noqa: F401
+    except (ImportError, ModuleNotFoundError):
+        return ("DISABLED (optimum-quanto not importable; "
+                "install with `%pip install -q -U optimum-quanto`)")
+    return "DISABLED (unknown reason; check optimum-quanto + transformers versions)"
 
 
 def _generate_text(prompt_text, *, model, tokenizer, max_new_tokens):
