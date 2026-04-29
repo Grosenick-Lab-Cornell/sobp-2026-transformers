@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 410" width="1280" height="410">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1320 410" width="1320" height="410">
   <defs>
     <style>
       @font-face {
@@ -8,29 +8,62 @@
       }
       .ink { stroke: #EDEDED; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
       .ink-thin { stroke: #9CA3AF; fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
-      .accent { stroke: #06B6D4; fill: none; stroke-width: 3.5; stroke-linecap: round; }
+      .ink-thick { stroke: #EDEDED; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+      .ink-fill { fill: #EDEDED; }
+      .accent { stroke: #06B6D4; fill: none; stroke-width: 2.5; stroke-linecap: round; }
       .accent-thin { stroke: #06B6D4; fill: none; stroke-width: 2; stroke-linecap: round; }
+      .stethoscope { stroke: #06B6D4; fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
       .title { font-family: 'Breip', cursive; font-size: 72px; fill: #EDEDED; }
-      .subtitle { font-family: 'Breip', cursive; font-size: 38px; fill: #9CA3AF; }
-      .meta { font-family: 'Breip', cursive; font-size: 28px; fill: #9CA3AF; }
+      .subtitle { font-family: 'Breip', cursive; font-size: 32px; fill: #9CA3AF; }
+      .meta { font-family: 'Breip', cursive; font-size: 22px; fill: #9CA3AF; }
     </style>
   </defs>
 
-  <rect width="1280" height="410" fill="#292A2C"/>
+  <rect width="1320" height="410" fill="#292A2C"/>
 
-  <!-- Title — two lines, 72px each -->
   <text x="80" y="115" class="title">Transformer &amp; LLM Basics</text>
   <text x="80" y="195" class="title">with Relevance to Psychiatry</text>
 
-  <!-- Teal flourish under the title -->
-  <path class="accent" d="M 78 213 Q 280 217, 540 211"/>
+  <path class="accent" d="M 78 213 Q 280 217, 540 211" stroke-width="3.5"/>
 
-  <!-- Undertext — matches original layout (no notebook scope line) -->
-  <text x="80" y="265" class="subtitle">SOBP - Session 1</text>
-  <text x="80" y="305" class="meta">Logan Grosenick · Weill Cornell Psychiatry</text>
+  <text x="80" y="265" class="subtitle">AI in Biomedical Sciences Workshop (SOBP)</text>
+  <text x="80" y="305" class="meta">Logan Grosenick · Weill Cornell Psychiatry · grosenicklab.org</text>
 
-  <!-- Decorative motif on right side: small "chart" with teal-highlighted line -->
-  <g transform="translate(1000, 95)">
+  <!-- Robot motif -->
+  <g transform="translate(850, 115) scale(0.85)">
+    <g transform="translate(120, 80)">
+      <path class="ink-thin" stroke="#EDEDED" stroke-width="1.8" d="M 78 0 L 80 -28"/>
+      <circle cx="80" cy="-30" r="6" fill="#06B6D4"/>
+      <path class="ink-thick"
+            d="M 22 4 Q 25 0, 32 0 L 128 2 Q 138 2, 138 9
+               L 140 88 Q 140 96, 132 96 L 28 94 Q 20 94, 20 86 Z"/>
+      <circle cx="55" cy="42" r="6" class="ink-fill"/>
+      <circle cx="105" cy="44" r="6" class="ink-fill"/>
+      <path class="ink-thin" stroke="#EDEDED" stroke-width="1.8" d="M 60 70 L 100 70"/>
+      <path class="ink-thin" stroke="#EDEDED" stroke-width="1.8" d="M 64 76 L 96 76"/>
+      <circle cx="24" cy="44" r="4" fill="#06B6D4"/>
+      <circle cx="134" cy="44" r="4" fill="#06B6D4"/>
+      <path class="ink-thin" stroke="#EDEDED" stroke-width="1.8" d="M 65 96 L 65 105"/>
+      <path class="ink-thin" stroke="#EDEDED" stroke-width="1.8" d="M 95 96 L 95 105"/>
+      <path class="ink-thick"
+            d="M 12 110 Q 14 105, 22 105 L 138 107 Q 148 107, 148 114
+               L 150 196 Q 150 204, 142 204 L 18 202 Q 10 202, 10 194 Z"/>
+      <path class="ink-thin" stroke="#EDEDED" stroke-width="1.8" d="M 10 130 Q -6 138, -10 158"/>
+      <circle cx="-10" cy="160" r="5" class="ink-fill"/>
+      <path class="stethoscope" d="M 24 47 Q 8 70, 12 100 Q 22 130, 78 152"/>
+      <path class="stethoscope" d="M 134 47 Q 150 70, 146 100 Q 136 130, 82 152"/>
+      <circle cx="80" cy="153" r="3" fill="#06B6D4"/>
+      <path class="stethoscope" d="M 80 156 Q 78 168, 80 178"/>
+      <path class="ink-thin" stroke="#EDEDED" stroke-width="1.8" d="M 150 132 Q 145 165, 110 178"/>
+      <circle cx="105" cy="180" r="5" class="ink-fill"/>
+      <circle cx="80" cy="180" r="11" fill="#06B6D4"/>
+      <circle cx="80" cy="180" r="11" stroke="#EDEDED" stroke-width="2" fill="none"/>
+      <circle cx="80" cy="180" r="7" stroke="#EDEDED" stroke-width="1.2" fill="none" opacity="0.55"/>
+    </g>
+  </g>
+
+  <!-- Chart motif -->
+  <g transform="translate(1080, 110)">
     <path class="ink"
           d="M 0 5 Q 0 0, 8 0 L 165 2 Q 173 2, 173 8 L 175 215
              Q 175 222, 167 222 L 8 220 Q 0 220, 0 213 Z"/>
