@@ -36,6 +36,11 @@ _OUTLINES_CACHE: dict = {}
 _OUTPUT_CACHE: dict | None = None
 _CACHE_PATH = Path(__file__).resolve().parent.parent / "content" / "cached_outputs.json"
 
+# Flip to True at the notebook scope (`utils.RERUN_CACHE = True`) to force every
+# subsequent cached_call_llm call to run the model live, bypassing the JSON
+# cache. Per-call override is also available via cached_call_llm(..., rerun=True).
+RERUN_CACHE: bool = False
+
 
 def load_model():
     """Load Phi-3.5 mini at 4-bit on GPU (or fp32 on CPU as a fallback).
@@ -106,24 +111,28 @@ def cached_call_llm(label: str, prompt: str | None = None, *,
                     max_new_tokens: int = 1024,
                     response_schema=None,
                     chars_per_second: int = 200,
-                    display_width: int = 88) -> str:
+                    display_width: int = 88,
+                    rerun: bool | None = None) -> str:
     """Replay a cached model output for `label`, with simulated streaming.
 
-    Reads content/cached_outputs.json. If the label is present, the
-    cached text is hard-wrapped to `display_width` columns and streamed
-    character-by-character at `chars_per_second`. Hard-wrapping prevents
-    long paragraphs from running off the right edge of the cell on a
-    projector, which Colab's default output-wrap does not always handle
-    when text arrives via single-character stdout writes.
+    Reads content/cached_outputs.json. If the label is present and
+    `rerun` is False, the cached text is hard-wrapped to `display_width`
+    columns and streamed character-by-character at `chars_per_second`.
 
-    Falls through to a live call_llm if the label is not in the cache and
-    a `prompt` plus `model` and `tokenizer` are provided.
+    To force live regeneration:
+      - per call: pass `rerun=True`
+      - notebook-wide: set `utils.RERUN_CACHE = True` once at the top
+
+    Falls through to a live call_llm if the label is missing OR rerun is
+    in effect, provided `prompt` plus `model` and `tokenizer` are given.
 
     Returns the full text (unwrapped, cached or freshly generated) so
     callers can further process the result.
     """
+    if rerun is None:
+        rerun = RERUN_CACHE
     cache = _load_output_cache()
-    if label in cache:
+    if not rerun and label in cache:
         text = cache[label]
         wrapped = _wrap_for_display(text, width=display_width)
         delay = 1.0 / max(chars_per_second, 1)
