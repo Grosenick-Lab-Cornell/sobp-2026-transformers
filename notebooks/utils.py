@@ -139,6 +139,16 @@ def cached_call_llm(label: str, prompt: str | None = None, *,
     cache = _load_output_cache()
     if not rerun and label in cache:
         text = cache[label]
+        if response_schema is not None:
+            # Cached structured-output call: stored as a JSON-serialized
+            # dict, returned to the caller as a parsed dict so downstream
+            # code can index into it the same way it would after a live
+            # call.
+            result = _json.loads(text)
+            print(f"[replaying cached {label!r}]")
+            print(_json.dumps(result, indent=2)[:3500])
+            return result
+        # Free-text call: stream chars (existing behavior).
         wrapped = _wrap_for_display(text, width=display_width)
         delay = 1.0 / max(chars_per_second, 1)
         for ch in wrapped:
@@ -166,7 +176,12 @@ def cached_call_llm(label: str, prompt: str | None = None, *,
     # path, which streams chars). Also auto-save to the JSON cache so the
     # next run replays deterministically; delete the label from
     # content/cached_outputs.json (or pass rerun=True) to regenerate.
-    if isinstance(result, str):
+    if isinstance(result, dict):
+        as_json = _json.dumps(result, indent=2, ensure_ascii=False)
+        print(as_json[:3500])
+        save_to_cache(label, as_json)
+        print(f"[saved to cache as {label!r}]")
+    elif isinstance(result, str):
         print(_wrap_for_display(result, width=display_width))
         save_to_cache(label, result)
         print(f"[saved to cache as {label!r}]")
