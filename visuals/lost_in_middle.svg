@@ -121,7 +121,7 @@
     <line class="accent-thin" x1="215" y1="374" x2="320" y2="374" stroke-width="1.5"/>
   </g>
 
-  <text x="200" y="640" class="hand-small">Eleanor's chart, 28 documents, ~12.5k words</text>
+  <text x="200" y="628" class="hand-small">Eleanor's chart</text>
 
   <g id="attention-curve">
     <path class="ink-thin" d="M 480 110 L 480 605"/>
@@ -216,8 +216,8 @@
   <text x="700" y="340" class="hand-teal">but the model's</text>
   <text x="700" y="390" class="hand-teal">attention isn't.</text>
 
-  <text x="60" y="652" class="hand-small" font-size="22">"lost in the middle", Liu et al., 2023.</text>
-  <text x="60" y="678" class="hand-small" font-size="22">simple retrieval has largely been solved on frontier models (2025);</text>
-  <text x="60" y="704" class="hand-small" font-size="22">multi-hop integration &amp; conflict-detection across long context remains affected.</text>
+  <text x="60" y="665" class="hand-small" font-size="22">"lost in the middle", Liu et al., 2023.</text>
+  <text x="60" y="691" class="hand-small" font-size="22">simple retrieval has largely been solved on frontier models (2025);</text>
+  <text x="60" y="717" class="hand-small" font-size="22">multi-hop integration &amp; conflict-detection across long context remains affected.</text>
 
 </svg>
