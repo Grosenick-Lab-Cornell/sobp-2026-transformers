@@ -3,15 +3,29 @@
 Imported by both NB1 and NB2 setup cells. Designed for fast iteration:
 notebooks pull this file via `git pull` so changes here propagate
 without re-loading the model (which is the slow part).
+
+Two generation paths:
+  call_llm(...)         live model generation (the default)
+  cached_call_llm(...)  replays a saved output from
+                        content/cached_outputs.json with a small
+                        per-character delay so it looks live; falls
+                        through to call_llm() if the label is missing.
+
+The cached path is what the §4 long-chart demos use on stage so the
+talk does not depend on multi-minute prefills working perfectly.
 """
 from __future__ import annotations
 
 import os
 
 # Set the CUDA allocator config before torch initializes its CUDA backend.
-# `expandable_segments:True` reduces fragmentation, which matters for the
-# §4 long-chart needle demo (17K-token forward passes on Colab T4).
+# `expandable_segments:True` reduces fragmentation on long-context calls.
 os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
+
+import json as _json
+import sys
+import time
+from pathlib import Path
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
@@ -19,6 +33,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 MODEL_NAME = "microsoft/Phi-3.5-mini-instruct"
 
 _OUTLINES_CACHE: dict = {}
+_OUTPUT_CACHE: dict | None = None
+_CACHE_PATH = Path(__file__).resolve().parent.parent / "content" / "cached_outputs.json"
 
 
 def load_model():
@@ -84,68 +100,97 @@ def call_llm(prompt: str, *, model, tokenizer, system: str | None = None,
     )
 
 
+def cached_call_llm(label: str, prompt: str | None = None, *,
+                    model=None, tokenizer=None,
+                    system: str | None = None,
+                    max_new_tokens: int = 1024,
+                    response_schema=None,
+                    chars_per_second: int = 200) -> str:
+    """Replay a cached model output for `label`, with simulated streaming.
+
+    Reads content/cached_outputs.json. If the label is present, prints the
+    cached text character-by-character at `chars_per_second` (about 4-8x
+    faster than Phi-3.5 actually generates at long context, fast enough
+    not to drag a stage demo, slow enough to look live).
+
+    Falls through to a live call_llm if the label is not in the cache and
+    a `prompt` plus `model` and `tokenizer` are provided.
+
+    Returns the full text (cached or freshly generated) so callers can
+    further process the result.
+    """
+    cache = _load_output_cache()
+    if label in cache:
+        text = cache[label]
+        delay = 1.0 / max(chars_per_second, 1)
+        for ch in text:
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+            time.sleep(delay)
+        sys.stdout.write("\n")
+        sys.stdout.flush()
+        return text
+
+    # Cache miss: live call.
+    if prompt is None or model is None or tokenizer is None:
+        raise RuntimeError(
+            f"cached_call_llm: no entry for label {label!r} in "
+            f"content/cached_outputs.json, and a live fallback "
+            f"requires `prompt`, `model`, and `tokenizer`."
+        )
+    print(f"[cache miss for {label!r}; running model live]")
+    return call_llm(
+        prompt, model=model, tokenizer=tokenizer,
+        system=system, max_new_tokens=max_new_tokens,
+        response_schema=response_schema,
+    )
+
+
+def save_to_cache(label: str, text: str) -> None:
+    """Write a label/text pair into content/cached_outputs.json. Useful at
+    rehearsal time: run the model once, then save its output so the talk
+    can replay it deterministically."""
+    cache = _load_output_cache()
+    cache[label] = text
+    _CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    _CACHE_PATH.write_text(_json.dumps(cache, indent=2, ensure_ascii=False))
+    # Force a reload on next read.
+    global _OUTPUT_CACHE
+    _OUTPUT_CACHE = None
+
+
+def _load_output_cache() -> dict:
+    global _OUTPUT_CACHE
+    if _OUTPUT_CACHE is None:
+        try:
+            _OUTPUT_CACHE = _json.loads(_CACHE_PATH.read_text())
+        except FileNotFoundError:
+            _OUTPUT_CACHE = {}
+    return _OUTPUT_CACHE
+
+
 def _free_cuda_memory():
-    """Clear CUDA cache + run gc. Cheap (~ms), prevents fragmentation
-    accumulating across long-context calls (matters for the §4 needle
-    demo which runs the model 3x sequentially on a multi-thousand-token
-    prompt)."""
+    """Clear CUDA cache + run gc."""
     import gc
     gc.collect()
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
 
 
-def _offloaded_cache_supported() -> bool:
-    """Whether transformers' OffloadedCache is importable.
-
-    OffloadedCache keeps only the currently-needed layer's K/V on GPU;
-    completed layers' caches sit on CPU memory and stream back as needed.
-    For a 25K-token prefill, this keeps peak GPU cache memory at one
-    layer (~300 MB) instead of all 32 (~9 GB). Generation is slower
-    per token (PCIe transfer overhead) but the prefill is the binding
-    constraint here anyway.
-    """
-    try:
-        from transformers import OffloadedCache  # noqa: F401
-        return True
-    except ImportError:
-        return False
-
-
-def kv_cache_status() -> str:
-    """Return 'ENABLED (offloaded)' or a one-line reason it isn't.
-
-    Setup cells print this so you can see at runtime whether long-context
-    calls will use the offloaded cache strategy or fall through to the
-    default in-memory cache.
-    """
-    if _offloaded_cache_supported():
-        return "ENABLED (offloaded; KV cache streams between GPU and CPU)"
-    return ("DISABLED (transformers does not expose OffloadedCache; "
-            "the long-chart §4 calls will likely OOM on T4)")
-
-
 def _generate_text(prompt_text, *, model, tokenizer, max_new_tokens):
     _free_cuda_memory()
     inputs = tokenizer(prompt_text, return_tensors="pt").to(model.device)
-
-    gen_kwargs = dict(
-        **inputs,
-        max_new_tokens=max_new_tokens,
-        do_sample=False,
-        pad_token_id=tokenizer.eos_token_id,
-    )
-    if _offloaded_cache_supported():
-        gen_kwargs["cache_implementation"] = "offloaded"
-
     with torch.no_grad():
-        output_ids = model.generate(**gen_kwargs)
+        output_ids = model.generate(
+            **inputs,
+            max_new_tokens=max_new_tokens,
+            do_sample=False,
+            pad_token_id=tokenizer.eos_token_id,
+        )
     response = tokenizer.decode(
         output_ids[0][inputs.input_ids.shape[1]:],
         skip_special_tokens=True,
     )
-    # Free the input tensors and output ids to reduce peak memory before
-    # the next call. The decoded string is what we actually return.
     del inputs, output_ids
     _free_cuda_memory()
     return response.strip()
@@ -154,13 +199,8 @@ def _generate_text(prompt_text, *, model, tokenizer, max_new_tokens):
 def _generate_schema(prompt_text, *, model, tokenizer, response_schema,
                      max_new_tokens):
     """Constrained generation via outlines. Guarantees valid JSON matching
-    the schema, parsed into a Python dict.
-
-    Recent outlines versions return a JSON string rather than a Pydantic
-    instance; we json.loads the string so the notebook always sees a dict.
-    """
+    the schema, parsed into a Python dict."""
     import outlines
-    import json as _json
 
     key = (id(model), id(tokenizer))
     if key not in _OUTLINES_CACHE:
