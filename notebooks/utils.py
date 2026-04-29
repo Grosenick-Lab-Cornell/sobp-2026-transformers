@@ -105,25 +105,29 @@ def cached_call_llm(label: str, prompt: str | None = None, *,
                     system: str | None = None,
                     max_new_tokens: int = 1024,
                     response_schema=None,
-                    chars_per_second: int = 200) -> str:
+                    chars_per_second: int = 200,
+                    display_width: int = 88) -> str:
     """Replay a cached model output for `label`, with simulated streaming.
 
-    Reads content/cached_outputs.json. If the label is present, prints the
-    cached text character-by-character at `chars_per_second` (about 4-8x
-    faster than Phi-3.5 actually generates at long context, fast enough
-    not to drag a stage demo, slow enough to look live).
+    Reads content/cached_outputs.json. If the label is present, the
+    cached text is hard-wrapped to `display_width` columns and streamed
+    character-by-character at `chars_per_second`. Hard-wrapping prevents
+    long paragraphs from running off the right edge of the cell on a
+    projector, which Colab's default output-wrap does not always handle
+    when text arrives via single-character stdout writes.
 
     Falls through to a live call_llm if the label is not in the cache and
     a `prompt` plus `model` and `tokenizer` are provided.
 
-    Returns the full text (cached or freshly generated) so callers can
-    further process the result.
+    Returns the full text (unwrapped, cached or freshly generated) so
+    callers can further process the result.
     """
     cache = _load_output_cache()
     if label in cache:
         text = cache[label]
+        wrapped = _wrap_for_display(text, width=display_width)
         delay = 1.0 / max(chars_per_second, 1)
-        for ch in text:
+        for ch in wrapped:
             sys.stdout.write(ch)
             sys.stdout.flush()
             time.sleep(delay)
@@ -157,6 +161,34 @@ def save_to_cache(label: str, text: str) -> None:
     # Force a reload on next read.
     global _OUTPUT_CACHE
     _OUTPUT_CACHE = None
+
+
+def _wrap_for_display(text: str, width: int = 88) -> str:
+    """Hard-wrap each line to `width` columns, preserving blank lines and
+    not joining lines together. Numbered lists and multi-paragraph blocks
+    survive intact; only over-wide lines actually get broken.
+    """
+    import textwrap
+    out_lines = []
+    for line in text.split("\n"):
+        if line.strip() == "":
+            out_lines.append("")
+            continue
+        # Preserve any leading whitespace (numbered-list indents etc.) when
+        # wrapping; subsequent wrapped lines align with the first content
+        # character.
+        stripped = line.lstrip()
+        leading = line[: len(line) - len(stripped)]
+        wrapped = textwrap.fill(
+            stripped,
+            width=max(20, width - len(leading)),
+            break_long_words=False,
+            break_on_hyphens=False,
+        )
+        out_lines.append(
+            "\n".join((leading + w) for w in wrapped.split("\n"))
+        )
+    return "\n".join(out_lines)
 
 
 def _load_output_cache() -> dict:
