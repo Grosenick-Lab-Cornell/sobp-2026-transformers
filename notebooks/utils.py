@@ -42,16 +42,21 @@ _CACHE_PATH = Path(__file__).resolve().parent.parent / "content" / "cached_outpu
 RERUN_CACHE: bool = False
 
 
-def load_model():
-    """Load Phi-3.5 mini at 4-bit on GPU (or fp32 on CPU as a fallback).
+def load_model(model_name: str = MODEL_NAME):
+    """Load a Phi-3-family model at 4-bit on GPU (or fp32 on CPU as a fallback).
 
     Returns (model, tokenizer). Slow on first call (~30 s with cached
     weights, ~1-2 min if downloading); cheap on subsequent calls in the
     same Colab session because HuggingFace caches to /root/.cache.
+
+    The default `model_name` is Phi-3.5 mini Instruct (128K context).
+    NB1 §4 also loads `microsoft/Phi-3-mini-4k-instruct` (same family,
+    4K context) as a small-context comparison for the lost-in-the-middle
+    demo. Both fit on a Colab T4 simultaneously at 4-bit.
     """
     device = "cuda" if torch.cuda.is_available() else "cpu"
     if device == "cpu":
-        print("⚠️  No GPU detected. Phi-3.5 will run on CPU and be very slow.")
+        print(f"⚠️  No GPU detected. {model_name} will run on CPU and be very slow.")
         print("   In Colab: Runtime → Change runtime type → T4 GPU.")
 
     bnb_config = BitsAndBytesConfig(
@@ -60,12 +65,12 @@ def load_model():
         bnb_4bit_quant_type="nf4",
     )
 
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
     # trust_remote_code=False (default): use transformers' native Phi3 impl
     # rather than the model repo's modeling_phi3.py, which calls a removed
     # DynamicCache.from_legacy_cache method on recent transformers versions.
     model = AutoModelForCausalLM.from_pretrained(
-        MODEL_NAME,
+        model_name,
         quantization_config=bnb_config if device == "cuda" else None,
         device_map="auto",
         torch_dtype=torch.float16 if device == "cuda" else torch.float32,
@@ -240,7 +245,16 @@ def _generate_text(prompt_text, *, model, tokenizer, max_new_tokens):
 def _generate_schema(prompt_text, *, model, tokenizer, response_schema,
                      max_new_tokens):
     """Constrained generation via outlines. Guarantees valid JSON matching
-    the schema, parsed into a Python dict."""
+    the schema, parsed into a Python dict.
+
+    We use sampling (do_sample=True, temperature=0.3) rather than greedy
+    here. With Phi-3.5 mini and a Pydantic schema whose fields are all
+    lists, greedy decoding tends to collapse to the shortest schema-valid
+    completion (every list empty), because emitting `[]` is locally
+    cheaper than committing to a first item. A small amount of
+    stochasticity escapes that attractor. We seed torch for run-to-run
+    repeatability within a session.
+    """
     import outlines
 
     key = (id(model), id(tokenizer))
@@ -248,11 +262,24 @@ def _generate_schema(prompt_text, *, model, tokenizer, response_schema,
         _OUTLINES_CACHE[key] = outlines.from_transformers(model, tokenizer)
     outlines_model = _OUTLINES_CACHE[key]
 
+    torch.manual_seed(0)
     result = outlines_model(
-        prompt_text, response_schema, max_new_tokens=max_new_tokens,
+        prompt_text, response_schema,
+        max_new_tokens=max_new_tokens,
+        do_sample=True, temperature=0.3, top_p=0.9,
     )
     if hasattr(result, "model_dump"):
         return result.model_dump()
     if isinstance(result, str):
-        return _json.loads(result)
+        try:
+            return _json.loads(result)
+        except _json.JSONDecodeError as e:
+            # Truncation at max_new_tokens leaves an unterminated string.
+            preview = result[: max(120, getattr(e, "pos", 0) + 40)]
+            raise RuntimeError(
+                f"_generate_schema: outlines returned a string that did not "
+                f"parse as JSON ({e}). Likely max_new_tokens={max_new_tokens} "
+                f"was hit before the schema completed. Raise it. First "
+                f"{len(preview)} chars of the bad output:\n{preview!r}"
+            ) from e
     return result
