@@ -64,3 +64,10 @@ wip/
 *.pem
 secrets.yaml
 secrets.json
+
+# ─── Claude Code session artifacts ───────────────────────────
+# Local operational brief and Claude Code's per-repo settings.
+# Useful for ongoing Claude sessions, not part of the project's
+# canonical artifacts.
+CLAUDE.md
+.claude/
