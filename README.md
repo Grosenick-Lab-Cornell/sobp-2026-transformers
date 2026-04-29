@@ -43,7 +43,7 @@ PNG + SVG of each visual; SVG is the source of truth, PNG is for quick mobile pr
 - **Provider-agnostic `call_llm()` wrapper** with **Phi-3.5 mini Instruct** (3.8B params, 128K context) as the default backend, running locally on Colab's GPU. No API key, no auth, no setup beyond a 1-2 min model download on first run. Commented Claude/OpenAI/Gemini alternatives. Audience sees this is concept-first, not vendor-promotion, and a small open-source model is *better* for these demos because the failure modes (lost-in-the-middle, hallucination, schema slop) are architecture-level mechanisms that show up more reliably at smaller scale.
 - **Whitfield chart** as the long-context demo content. SSRI-induced SIADH/seizure in 2022 is the documented contraindication; current admission's Plan re-proposes sertraline. ~12,500 words, 28 documents, no in-chart safety catch (max demo teeth).
 - **RAG corpus** = 5 real open-access ketamine/esketamine TRD papers (Berman 2000, Zarate 2006, Murrough 2013, Daly 2018, McIntyre 2021), abstracts to be baked into NB2 as Python strings.
-- **Schema extraction** input = Document 24 of the chart (current admission H&P).
+- **Schema extraction** input = Document 40 of the chart (current admission H&P).
 - **Visual aesthetic**: zine-like, Breip handwriting + monospace tokens, electric teal `#06B6D4` accent on `#fdfbf4` paper, ink black `#1a1a1a`.
 
 ---

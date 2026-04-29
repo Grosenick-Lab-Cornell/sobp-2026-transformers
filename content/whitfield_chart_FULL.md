@@ -498,6 +498,29 @@ She has had a repeat BMP on 2022-05-04 — sodium 137, creatinine 1.0, otherwise
 ## Document 14 — Outpatient Psychiatry Note
 
 **Provider:** Dr. M. Halvorsen, MD
+**Date:** 2022-06-23
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Six weeks post-discharge from her April hospitalization. Bupropion XL was titrated to 300 mg daily during the inpatient stay and she has continued at this dose. She reports mood is "lifted but not light" and that she is "more myself than I have been in months." Sleep 6.5 hours nightly, appetite returning toward baseline, weight up 1 kg from discharge (now 64 kg). No headaches. No further seizure activity. She has resumed light teaching duties at half time.
+
+She continues weekly CBT with [name] in the outpatient clinic. Her husband completed FOLFIRINOX cycle 4 last week and has tolerated treatment with manageable nausea. She reports caring for him is "actually grounding" rather than burdensome.
+
+**MSE:** Appropriate appearance, full affect, mood "good," linear thought, no SI/HI, fair insight, intact judgment.
+
+**Assessment:** MDD, recurrent, in early partial remission on bupropion XL 300 mg. Severe documented ADR to a prior antidepressant (see April 2022 admission DC summary). GAD quiescent. Stable.
+
+**Plan:**
+1. Continue bupropion XL 300 mg daily.
+2. Continue trazodone 50 mg QHS PRN (uses 1-2 nights per week).
+3. Continue weekly CBT.
+4. Repeat BMP at next visit (last 2022-05-09: Na 139, Cr 1.1).
+5. Follow-up in 6 weeks.
+
+---
+
+## Document 15 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
 **Date:** 2022-08-09
 **Visit type:** Follow-up, 30 minutes
 
@@ -521,7 +544,89 @@ No SI. Sleep adequate with occasional trazodone use (2–3 nights per week). Wei
 
 ---
 
-## Document 15 — Outpatient Psychiatry Note
+## Document 16 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2022-09-27
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Her husband's oncology team has decided to transition him to second-line chemotherapy (FOLFIRI + cetuximab) after the FOLFIRINOX course produced only mixed response. He starts the new regimen next week. The patient describes "a tightening in my chest about all of it" but says the conversation with the oncologist was "actually a relief, because at least there is a plan." She continues teaching part-time and finds it stabilizing.
+
+Mood reasonable. PHQ-9 today: 7 (mild). Sleep 6 hours, appetite stable. No SI/HI. No alcohol. She has been walking with a friend three mornings a week.
+
+**MSE:** Pleasant, mood "anxious about the next round," affect appropriately reactive, no thought disorder, no SI.
+
+**Assessment:** MDD in partial remission, situational anxiety component related to husband's illness. Bupropion regimen stable.
+
+**Plan:** Continue bupropion 300 mg daily. Continue trazodone PRN. Continue CBT. Re-check in 6 weeks.
+
+---
+
+## Document 17 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2022-11-15
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Her husband has now had three cycles of second-line therapy. He has been more fatigued than during FOLFIRINOX but has not had treatment-limiting toxicities. They are planning to host their daughter and son-in-law for Thanksgiving despite the chemo schedule. Patient describes a "low-grade hum of anxiety" but no acute symptoms. Sleep 6 hours, weight stable, no SI/HI. PHQ-9: 8.
+
+**MSE:** Pleasant, mildly anxious affect, mood "managing," linear, no SI.
+
+**Assessment:** MDD in stable partial remission. Caregiver-context anxiety. No medication change indicated.
+
+**Plan:** Continue current regimen. 8-week follow-up. Encourage continued therapy and social engagement.
+
+---
+
+## Document 18 — Outpatient Psychiatry Note
+
+**Provider:** Dr. R. Chen, MD (locum, covering Dr. Halvorsen)
+**Date:** 2023-01-20
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Patient seen today by Dr. Chen with Dr. Halvorsen on family leave. Holidays were "harder than I expected" with husband visibly weaker. Daughter and grandson visited for two weeks over Christmas, which was a lift. She slept poorly the week of Christmas (4-5 hours, increased trazodone use to 4 nights weekly) but has returned closer to baseline. PHQ-9: 9.
+
+She denies SI/HI. She volunteers that she has been thinking about "what comes next" in terms of caregiving and that her daughter has begun looking into hospice options for when needed. Patient describes this conversation as "appropriate, sad, not crisis."
+
+**MSE:** Tired-appearing, affect appropriately constrained, mood "tired and worried," linear thought, no SI.
+
+**Assessment:** MDD in partial remission with situational stressors. No acute change in clinical status. Bupropion well-tolerated; allergy/intolerance list reviewed and unchanged from prior visits. PHQ-9 trending mildly upward but within expected range given context.
+
+**Plan:**
+1. Continue bupropion XL 300 mg daily.
+2. Continue trazodone 50 mg QHS PRN.
+3. Defer medication adjustment pending Dr. Halvorsen's return.
+4. Reinforce safety planning. Patient has clear means (her bupropion, trazodone, husband's chemo regimen, antiemetics, and opioid breakthroughs at home), and we discussed that her daughter is keeping a separate count.
+5. Continue CBT.
+6. Return in 6 weeks or sooner.
+
+---
+
+## Document 19 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2023-03-08
+**Visit type:** Follow-up, 45 minutes (urgent add-on)
+
+**Interval:** Patient called Wednesday after her husband's most recent imaging showed disease progression on second-line therapy. Oncology has recommended transition to home hospice. She is processing. She describes herself as "expecting this since November but feeling it for the first time today." Sleep poor this past week (4 hours, fragmented). PHQ-9: 11. She denies SI/HI but acknowledges feeling "drained beyond drained."
+
+She is in close contact with her daughter, who has begun arranging to spend longer stretches with her. The patient has discussed with her CBT therapist a stepped-up frequency over the next several weeks.
+
+**MSE:** Tearful at intervals, appropriate to content, mood "depleted," affect mobile within tearful range, linear thought, no SI/HI. Insight intact, judgment intact.
+
+**Assessment:** MDD in partial remission, with acute stress reaction and anticipatory grief in the context of husband's confirmed disease progression and hospice transition. PHQ-9 11 reflects expected reactive worsening without crossing into a new depressive episode.
+
+**Plan:**
+1. Continue bupropion XL 300 mg daily.
+2. Continue trazodone 50 mg QHS PRN; may use nightly during this acute stretch.
+3. CBT to weekly through this transition.
+4. Discussed possibility of brief addition of mirtazapine (sleep, appetite, anxiolysis) if symptoms persist; defer for now and re-evaluate at next visit. **Do not consider any agent on her documented intolerance list.**
+5. Safety check with daughter, who is at the visit by phone. Daughter reports she has secured both patients' medications at home.
+6. Return in 4 weeks, sooner if needed.
+
+---
+
+## Document 20 — Outpatient Psychiatry Note
 
 **Provider:** Dr. M. Halvorsen, MD
 **Date:** 2023-04-11
@@ -544,7 +649,43 @@ Sleep 6 hours average, appetite stable, weight 64 kg, no SI/HI, no new medical i
 
 ---
 
-## Document 16 — Outpatient Psychiatry Note
+## Document 21 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2023-06-08
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Husband has now been on home hospice for ~12 weeks. Patient describes a "rhythm" to caregiving. She is sleeping 6 hours, eating reasonably, weight 63 kg. PHQ-9: 8. She has resumed Sunday church attendance when a hospice volunteer can sit with her husband for two hours. She declines the previously discussed mirtazapine addition: "I am holding."
+
+No SI/HI. No new medical issues. No alcohol beyond the occasional glass with dinner.
+
+**MSE:** Tired but engaged, mood "okay for what is happening," affect appropriately reactive, linear, no SI.
+
+**Assessment:** MDD in stable partial remission. Significant caregiver burden with adaptive coping. Bupropion regimen continues to be well tolerated.
+
+**Plan:** Continue bupropion 300 mg daily, trazodone PRN. Continue CBT. 3-month follow-up. Earlier as needed.
+
+---
+
+## Document 22 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2023-08-15
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Hospice now ~5 months. Husband is more confused at intervals but generally comfortable. Patient describes a kind of fatigue that "is not the depression I have known, it is something else." She has been more isolated this summer with her teaching colleagues out of town and her usual walking partner away on family travel. PHQ-9: 9.
+
+She raises whether augmentation is appropriate; we discuss vortioxetine versus dose adjustment of bupropion versus continued watchful waiting, and she elects to continue current regimen with a tighter follow-up cadence. She specifically does not want to start anything new "while I am stretched this thin." Her medication intolerance list was reviewed and remains unchanged.
+
+**MSE:** Pleasant, fatigued, affect mobile, mood "stretched," linear, no SI.
+
+**Assessment:** MDD in partial remission with significant situational fatigue. Patient declines augmentation at this time.
+
+**Plan:** Continue bupropion 300 mg daily, trazodone PRN. CBT continued. Return in 6 weeks for closer monitoring.
+
+---
+
+## Document 23 — Outpatient Psychiatry Note
 
 **Provider:** Dr. M. Halvorsen, MD
 **Date:** 2023-10-05
@@ -564,7 +705,23 @@ Medications: bupropion XL 300 mg daily, trazodone 50 mg QHS PRN, amlodipine, ato
 
 ---
 
-## Document 17 — Outpatient Psychiatry Note
+## Document 24 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2023-12-05
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Husband still at home on hospice; 9 months in. Patient describes the holidays approaching as "muscle memory I can lean into." Daughter and grandson Noah will be staying for a long stretch over Christmas. PHQ-9: 8. Sleep 6 hours, weight 63 kg.
+
+**MSE:** Engaged, affect reactive, mood "steady within all this," no SI.
+
+**Assessment:** MDD in stable partial remission. Bupropion regimen unchanged.
+
+**Plan:** Continue current meds. 10-week follow-up.
+
+---
+
+## Document 25 — Outpatient Psychiatry Note
 
 **Provider:** Dr. M. Halvorsen, MD
 **Date:** 2024-02-20
@@ -584,7 +741,71 @@ Mood stable. Sleep 6 hours. Weight 63 kg. No SI. Denies alcohol beyond the occas
 
 ---
 
-## Document 18 — Outpatient Psychiatry Note
+## Document 26 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2024-04-30
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Husband further declined this spring; he is now mostly bed-bound with intermittent confusion. Patient is doing more of the personal care herself with hospice nursing supplementation. Daughter has been visiting weekly. PHQ-9: 10. She describes "no real depression, just an unending tired."
+
+She raises whether her bupropion dose could be tweaked. We discuss that increasing the dose is unlikely to address fatigue specifically and may worsen sleep; she agrees to defer. We also briefly revisit non-pharmacologic options (light box for early-morning routine, brief walking during respite hours).
+
+**MSE:** Tired, affect modestly constricted, mood "tired," linear, no SI.
+
+**Assessment:** MDD in partial remission with prominent caregiver-related fatigue. No medication change today.
+
+**Plan:** Continue bupropion 300 mg daily, trazodone PRN. Trial light box at 06:30 for 30 min daily. Continue CBT. Return in 6 weeks.
+
+---
+
+## Document 27 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2024-06-25
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Husband's status has worsened over the past two weeks. Hospice nurses are now visiting daily and have begun the family conversation about the active dying period. Daughter and son-in-law have moved into the spare bedroom for the duration. Patient is "more present than I expected" and has started taking some short walks with her grandson while her daughter sits with her husband. Sleep 5-6 hours; trazodone use up to 4 nights per week. PHQ-9: 11. No SI/HI.
+
+She declines escalation of the antidepressant regimen and reiterates her preference to maintain her current medication footprint, noting that her medication intolerance history makes her cautious about any change. We confirmed her allergy/intolerance list is correctly documented in the chart. Daughter is present at the visit and raises lethal-means concerns proactively; she is keeping all medications in a locked container at the daughter's house, including patient's own and husband's hospice meds.
+
+**MSE:** Pleasant, mildly tearful, affect appropriately reactive, mood "approaching it," linear, no SI/HI.
+
+**Assessment:** MDD in partial remission with adaptive grief. Active pre-bereavement period. Lethal-means counseling reinforced; daughter has implemented appropriate measures.
+
+**Plan:**
+1. Continue bupropion 300 mg daily.
+2. Continue trazodone 50 mg QHS PRN.
+3. Increase CBT to weekly through this period.
+4. Bereavement support resources reviewed (hospice social worker has already been in contact).
+5. Return in 3 weeks, or sooner if patient or family requests.
+
+---
+
+## Document 28 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2024-08-13
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Husband is in the active dying period per hospice. He has been largely unresponsive for the past several days. The family is at home with him in shifts. Patient is functioning. Sleeping in fragments (3-4 hours total). Eating little. Weight down 1 kg from prior visit (now 62 kg). PHQ-9: 12. No SI/HI.
+
+She declines a temporary increase in trazodone or addition of any other agent. "Whatever I do now I will have to undo. I would rather just be here." Her clinical reasoning is intact and we discuss that this stretch is best managed without medication changes.
+
+**MSE:** Composed but tired, affect reactive within constrained range, mood "in it," linear thought, no SI/HI.
+
+**Assessment:** MDD in partial remission, active pre-bereavement, expected acute symptom worsening. Patient's stated preference to defer medication changes is reasonable.
+
+**Plan:**
+1. Continue bupropion 300 mg daily.
+2. Continue trazodone 50 mg QHS PRN.
+3. Daughter present and engaged; lethal-means safeguards remain in place.
+4. Hospice social worker actively involved; will coordinate post-loss bereavement.
+5. Open access for urgent visit; offer return in 2-3 weeks post-event.
+
+---
+
+## Document 29 — Outpatient Psychiatry Note
 
 **Provider:** Dr. M. Halvorsen, MD
 **Date:** 2024-09-22
@@ -612,7 +833,50 @@ She is not asking for medication changes. She reports good tolerance of bupropio
 
 ---
 
-## Document 19 — Outpatient Psychiatry Note
+## Document 30 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2024-11-18
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Approximately 10 weeks post-bereavement. Patient describes mood as "underwater but moving." She has been sleeping 6 hours with regular trazodone use (4-5 nights weekly), eating reasonably (weight stable at 62 kg), and has started walking daily again. Daughter visits weekly. Her grandson Noah's birthday last week was "a hard, good day." PHQ-9: 10.
+
+She denies SI/HI. She describes the grief as "what I expected, plus more." She is engaged in a community grief group through her church (twice monthly).
+
+**MSE:** Composed, affect appropriately reactive, mood "doing the work," linear, no SI.
+
+**Assessment:** MDD in partial remission, complicated grief course (uncomplicated to this point). Bupropion regimen unchanged.
+
+**Plan:** Continue current meds. Continue CBT. Continue grief group. 10-week follow-up. Earlier if symptoms escalate.
+
+---
+
+## Document 31 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2025-01-21
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** First Christmas without her husband. Patient describes the holiday as "harder than I prepared for." She traveled to her daughter's home for the week, which she found grounding. Returned home Jan 4. The two weeks since returning home alone have been "the worst stretch since the funeral." PHQ-9: 13. Sleep variable (5-6 hours, more trazodone, now 5-6 nights weekly). Weight down to 61 kg.
+
+No SI/HI. She is engaged with her grief group and her CBT therapist. She is also walking daily and seeing her usual friends.
+
+We discuss medication options: dose increase, augmentation, or addition of a non-SSRI agent. She is not enthusiastic about a change but is open to revisiting at next visit if symptoms persist. We also discuss the option of a brief course of mirtazapine for sleep and appetite given the weight loss; she requests to defer.
+
+**MSE:** Subdued, affect reactive within narrow range, mood "low," linear thought, no SI/HI.
+
+**Assessment:** MDD in partial remission with situational worsening (first holidays alone). Weight loss of 2 kg over 4 months bears watching. Considering augmentation if next visit shows continued PHQ-9 elevation.
+
+**Plan:**
+1. Continue bupropion 300 mg daily.
+2. Continue trazodone 50 mg QHS PRN.
+3. Continue CBT and grief group.
+4. Recheck weight and PHQ-9 in 4 weeks (sooner than usual).
+5. Lethal-means counseling reinforced; daughter remains in close contact.
+
+---
+
+## Document 32 — Outpatient Psychiatry Note
 
 **Provider:** Dr. M. Halvorsen, MD
 **Date:** 2025-03-14
@@ -634,7 +898,41 @@ Continues on bupropion XL 300 mg daily, trazodone 50 mg QHS PRN (now used 1–2 
 
 ---
 
-## Document 20 — Outpatient Psychiatry Note
+## Document 33 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2025-04-22
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Roughly 7 months post-bereavement. PHQ-9 today: 9, improved from January's 13. Weight has come back to 62.5 kg. Sleep 6 hours, trazodone use back down to 3 nights weekly. She has stayed engaged with her grief group and is continuing CBT biweekly.
+
+She mentions that the anniversary of her 2022 hospitalization passed earlier this month and that she "thought about it more than usual" but did not have any new symptoms. She remains "deeply averse" to any antidepressant change.
+
+**MSE:** Pleasant, more reactive affect than at last visit, mood "lifted slightly," linear, no SI/HI.
+
+**Assessment:** MDD in partial remission, post-bereavement course adaptive. No medication changes.
+
+**Plan:** Continue current regimen. Continue CBT and grief group. 8-week follow-up.
+
+---
+
+## Document 34 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2025-05-27
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Patient has had a stable interval. Her grandson Noah turned 4 in early May; she traveled to celebrate. She is back home and reports settled mood. PHQ-9: 8.
+
+**MSE:** Bright, mood "decent," affect mobile, linear, no SI.
+
+**Assessment:** MDD in partial remission, stable.
+
+**Plan:** Continue bupropion 300 mg daily, trazodone PRN. CBT and grief group continue. 8-week follow-up.
+
+---
+
+## Document 35 — Outpatient Psychiatry Note
 
 **Provider:** Dr. M. Halvorsen, MD
 **Date:** 2025-07-01
@@ -658,7 +956,30 @@ Medications unchanged. No side effects.
 
 ---
 
-## Document 21 — Outpatient Psychiatry Note
+## Document 36 — Outpatient Psychiatry Note
+
+**Provider:** Dr. M. Halvorsen, MD
+**Date:** 2025-08-05
+**Visit type:** Follow-up, 30 minutes
+
+**Interval:** Patient describes a slow drift downward over the past 2-3 weeks. She attributes it partly to anticipating the upcoming 1-year anniversary of her husband's death (early September) and partly to a recent flare of OA pain that has limited her walking. PHQ-9: 11. Sleep 5-6 hours, weight 62 kg. No SI/HI.
+
+She has had a few nights of more pronounced rumination but has been using her CBT skills and her grief group. She again does not want a medication change but is willing to revisit if things worsen further. We agree to a tighter follow-up cadence through the anniversary period.
+
+**MSE:** Mildly subdued, affect reactive, mood "anticipating," linear, no SI.
+
+**Assessment:** MDD in partial remission with situational worsening pre-anniversary. No medication change today; close monitoring through September.
+
+**Plan:**
+1. Continue bupropion 300 mg daily.
+2. Continue trazodone 50 mg QHS PRN.
+3. Continue CBT (weekly through anniversary period) and grief group.
+4. Return in 3 weeks.
+5. Reinforce safety: patient has clear access to means (own meds, leftover hospice meds in lockbox at daughter's), daughter remains the primary check-in.
+
+---
+
+## Document 37 — Outpatient Psychiatry Note
 
 **Provider:** Dr. M. Halvorsen, MD
 **Date:** 2025-08-28
@@ -692,7 +1013,7 @@ No recent medical illness, no new medications, no changes in medical regimen.
 
 ---
 
-## Document 22 — Emergency Department Note
+## Document 38 — Emergency Department Note
 
 **Provider:** Dr. J. Morales, MD (Emergency Medicine)
 **Consultant:** Dr. M. Halvorsen, MD (Outpatient psychiatrist, by phone) / Inpatient psychiatry admitting team
@@ -725,7 +1046,7 @@ On ED evaluation, Ms. Whitfield is quiet, cooperative, slightly hunched, tearful
 
 ---
 
-## Document 23 — Medication Reconciliation
+## Document 39 — Medication Reconciliation
 
 **Date:** 2025-09-03 (admission)
 **Performed by:** RN M. Okafor / Verified by: Dr. L. Kim, MD (Admitting PGY-2)
@@ -769,7 +1090,7 @@ Ms. Whitfield's medications were reviewed with her and her daughter. Both confir
 
 ---
 
-## Document 24 — Current Admission History & Physical
+## Document 40 — Current Admission History & Physical
 
 **ADMISSION HISTORY & PHYSICAL — PSYCHIATRY**
 **Patient:** Eleanor R. Whitfield
@@ -963,7 +1284,26 @@ She is presently treatment-incomplete — she has had adequate trials of fluoxet
 
 ---
 
-## Document 25 — Current Admission Progress Note — Hospital Day 1
+## Document 41 — Nursing Shift Note — Hospital Day 1 (Night Shift)
+
+**Provider:** D. Aguilar, RN
+**Date/Shift:** 2025-09-03/04, 23:00–07:00
+**Unit:** 4-West, Room 412
+
+**Assessment:** Patient on admission day 1, q15 min observation. Oriented x4, cooperative with admission process, all belongings searched and returned minus prohibited items. Ate 40% of dinner tray. Took evening medications as ordered (bupropion held to AM per order set, mirtazapine 15 mg QHS given, trazodone 50 mg PRN given at patient's request at 21:30). Vital signs stable on evening check.
+
+Patient noted to be tearful around 2200 when her daughter departed. She was offered support, accepted a brief conversation with this nurse, then requested to go to bed. Asleep by 2315 per q15 checks.
+
+Awake and restless 0415–0500, observed sitting up in bed. Declined PRN medications, stated "I just can't sleep." Conversation with patient — she endorses low mood and passive SI of the type she reported at admission, denies active thoughts, denies plan or intent. She declines to speak with on-call provider; requests to try to rest. She returned to bed and slept intermittently until morning.
+
+No falls. No attempts at self-harm. No concerning behaviors observed. Precautions maintained throughout shift.
+
+**D. Aguilar, RN, BSN**
+
+---
+
+# END OF CHART
+## Document 42 — Current Admission Progress Note — Hospital Day 1
 
 **Provider:** J. Carter, MD (PGY-3 Resident) / Attending: Dr. N. Raskin, MD
 **Date:** 2025-09-04, 07:20
@@ -983,25 +1323,7 @@ She is presently treatment-incomplete — she has had adequate trials of fluoxet
 
 ---
 
-## Document 26 — Current Admission Progress Note — Hospital Day 2
-
-**Provider:** J. Carter, MD (PGY-3 Resident)
-**Date:** 2025-09-05, 07:15
-
-**Subjective:** Patient slept 6 hours. Ate 50% of dinner last night, 30% of breakfast. Attended morning community group. Family meeting this afternoon with daughter at 14:00. Patient reports mood "a little less heavy" today. No active SI overnight. Denies HI.
-
-**Objective:** Vitals stable. MSE unchanged from HD1.
-
-**Assessment/Plan:**
-1. MDD, severe — hospital day 2. Early stabilization.
-2. Continue current pharmacologic regimen.
-3. Continue trazodone PRN.
-4. Family meeting this afternoon.
-5. Continue precautions.
-
----
-
-## Document 27 — Current Admission Social Work Note — Hospital Day 1
+## Document 43 — Current Admission Social Work Note — Hospital Day 1
 
 **Provider:** M. Ingalls, LCSW
 **Date:** 2025-09-04, 15:30
@@ -1033,22 +1355,20 @@ Met with patient and with her daughter (Caroline Whitfield, 35, lives 20 minutes
 
 ---
 
-## Document 28 — Nursing Shift Note — Hospital Day 1 (Night Shift)
+## Document 44 — Current Admission Progress Note — Hospital Day 2
 
-**Provider:** D. Aguilar, RN
-**Date/Shift:** 2025-09-03/04, 23:00–07:00
-**Unit:** 4-West, Room 412
+**Provider:** J. Carter, MD (PGY-3 Resident)
+**Date:** 2025-09-05, 07:15
 
-**Assessment:** Patient on admission day 1, q15 min observation. Oriented x4, cooperative with admission process, all belongings searched and returned minus prohibited items. Ate 40% of dinner tray. Took evening medications as ordered (bupropion held to AM per order set, mirtazapine 15 mg QHS given, trazodone 50 mg PRN given at patient's request at 21:30). Vital signs stable on evening check.
+**Subjective:** Patient slept 6 hours. Ate 50% of dinner last night, 30% of breakfast. Attended morning community group. Family meeting this afternoon with daughter at 14:00. Patient reports mood "a little less heavy" today. No active SI overnight. Denies HI.
 
-Patient noted to be tearful around 2200 when her daughter departed. She was offered support, accepted a brief conversation with this nurse, then requested to go to bed. Asleep by 2315 per q15 checks.
+**Objective:** Vitals stable. MSE unchanged from HD1.
 
-Awake and restless 0415–0500, observed sitting up in bed. Declined PRN medications, stated "I just can't sleep." Conversation with patient — she endorses low mood and passive SI of the type she reported at admission, denies active thoughts, denies plan or intent. She declines to speak with on-call provider; requests to try to rest. She returned to bed and slept intermittently until morning.
-
-No falls. No attempts at self-harm. No concerning behaviors observed. Precautions maintained throughout shift.
-
-**D. Aguilar, RN, BSN**
+**Assessment/Plan:**
+1. MDD, severe — hospital day 2. Early stabilization.
+2. Continue current pharmacologic regimen.
+3. Continue trazodone PRN.
+4. Family meeting this afternoon.
+5. Continue precautions.
 
 ---
-
-# END OF CHART
