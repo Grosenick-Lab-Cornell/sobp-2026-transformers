@@ -104,7 +104,7 @@ section { padding: 1.25rem 0 2rem; }
 /* ─── notebook cards ────────────────────────────────────────────────── */
 .cards {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.5rem;
   margin-top: 1.25rem;
 }
@@ -1056,6 +1056,20 @@ footer a:hover, footer a:focus { color: var(--ink); }
              target="_blank" rel="noopener">Open in Colab</a>
           <a class="btn btn-secondary"
              href="https://github.com/Grosenick-Lab-Cornell/sobp-2026-transformers/raw/main/notebooks/02_using_llms_for_psychiatric_research.ipynb"
+             target="_blank" rel="noopener">Download Notebook</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <span class="label">Notebook 3</span>
+        <h3>Computable phenotyping with LLMs</h3>
+        <p>RDoC dimensional scoring and PHQ-9 estimation from clinical notes, three approaches (bag-of-words, SQL, LLM via Ollama), in R. By Tom McCoy (MGH).</p>
+        <div class="btns">
+          <a class="btn btn-primary"
+             href="https://colab.research.google.com/github/Grosenick-Lab-Cornell/sobp-2026-transformers/blob/main/notebooks/McCoy_SOBP_2026.ipynb"
+             target="_blank" rel="noopener">Open in Colab</a>
+          <a class="btn btn-secondary"
+             href="https://github.com/Grosenick-Lab-Cornell/sobp-2026-transformers/raw/main/notebooks/McCoy_SOBP_2026.ipynb"
              target="_blank" rel="noopener">Download Notebook</a>
         </div>
       </article>
