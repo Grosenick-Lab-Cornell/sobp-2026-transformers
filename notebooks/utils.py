@@ -95,43 +95,34 @@ def _free_cuda_memory():
         torch.cuda.empty_cache()
 
 
-def _build_quantized_cache_config():
-    """Return a 4-bit KV-cache config if quanto is fully usable, else None.
+def _offloaded_cache_supported() -> bool:
+    """Whether transformers' OffloadedCache is importable.
 
-    Tests not just basic imports but the specific quanto API
-    (`qint4`) that transformers' QuantoQuantizedCache calls internally.
-    Catches optimum-quanto / transformers version mismatches that
-    would otherwise pass `from optimum.quanto import ...` cleanly but
-    fail at cache-init time.
+    OffloadedCache keeps only the currently-needed layer's K/V on GPU;
+    completed layers' caches sit on CPU memory and stream back as needed.
+    For a 25K-token prefill, this keeps peak GPU cache memory at one
+    layer (~300 MB) instead of all 32 (~9 GB). Generation is slower
+    per token (PCIe transfer overhead) but the prefill is the binding
+    constraint here anyway.
     """
     try:
-        from transformers import QuantizedCacheConfig
-        from optimum.quanto import qint4  # noqa: F401
-        return QuantizedCacheConfig(backend="quanto", nbits=4)
-    except (ImportError, ModuleNotFoundError, AttributeError):
-        return None
+        from transformers import OffloadedCache  # noqa: F401
+        return True
+    except ImportError:
+        return False
 
 
 def kv_cache_status() -> str:
-    """Return 'ENABLED (4-bit, quanto)' or a one-line reason it isn't.
+    """Return 'ENABLED (offloaded)' or a one-line reason it isn't.
 
-    Public-facing: setup cells print this so you can see at runtime
-    whether long-context calls will actually use the quantized cache.
+    Setup cells print this so you can see at runtime whether long-context
+    calls will use the offloaded cache strategy or fall through to the
+    default in-memory cache.
     """
-    cfg = _build_quantized_cache_config()
-    if cfg is not None:
-        return "ENABLED (4-bit, quanto backend)"
-    # Diagnose the specific reason.
-    try:
-        from transformers import QuantizedCacheConfig  # noqa: F401
-    except ImportError:
-        return "DISABLED (transformers does not expose QuantizedCacheConfig)"
-    try:
-        from optimum.quanto import qint4  # noqa: F401
-    except (ImportError, ModuleNotFoundError):
-        return ("DISABLED (optimum-quanto not importable; "
-                "install with `%pip install -q -U optimum-quanto`)")
-    return "DISABLED (unknown reason; check optimum-quanto + transformers versions)"
+    if _offloaded_cache_supported():
+        return "ENABLED (offloaded; KV cache streams between GPU and CPU)"
+    return ("DISABLED (transformers does not expose OffloadedCache; "
+            "the long-chart §4 calls will likely OOM on T4)")
 
 
 def _generate_text(prompt_text, *, model, tokenizer, max_new_tokens):
@@ -144,10 +135,8 @@ def _generate_text(prompt_text, *, model, tokenizer, max_new_tokens):
         do_sample=False,
         pad_token_id=tokenizer.eos_token_id,
     )
-    cache_config = _build_quantized_cache_config()
-    if cache_config is not None:
-        gen_kwargs["cache_implementation"] = "quantized"
-        gen_kwargs["cache_config"] = cache_config
+    if _offloaded_cache_supported():
+        gen_kwargs["cache_implementation"] = "offloaded"
 
     with torch.no_grad():
         output_ids = model.generate(**gen_kwargs)

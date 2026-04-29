@@ -5,7 +5,6 @@ accelerate>=0.30
 
 # Not in Colab by default.
 bitsandbytes>=0.43         # 4-bit quantization for Phi-3.5 mini on a T4
-optimum-quanto>=0.2.4      # 4-bit KV cache for long-context calls
 outlines>=0.1.0            # constrained-generation for NB2 §2 schema demo
 tiktoken>=0.7.0            # tokenizer-inspection demos in NB1 §1
 pydantic>=2.0              # schema definitions in NB2 §2
