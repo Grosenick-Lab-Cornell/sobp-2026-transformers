@@ -19,11 +19,11 @@ Resources from the **AI in Biomedical Sciences Workshop** at SOBP 2026.
 
 ## Run the notebooks
 
-Notebooks 1 and 2 run on Colab's free T4 GPU with a small open-source model (Phi-3.5 mini Instruct) loaded locally. No API keys, no vendor accounts. Notebook 3 (McCoy) is in R; see notebook header for runtime notes.
+All three notebooks run on Colab's free T4 GPU. Notebooks 1 and 2 use Phi-3.5 mini Instruct locally (Python). Notebook 3 (McCoy, in R) uses `llama3.2:3b` via Ollama. No API keys, no vendor accounts.
 
 Once a Colab notebook is open:
 
-1. **Runtime → Change runtime type → T4 GPU** (for notebooks 1 and 2).
+1. **Runtime → Change runtime type → T4 GPU**.
 2. **Run all cells.** The first setup cell installs dependencies and downloads the model (about 1 to 2 minutes); subsequent cells are fast.
 
 The §4 long-chart cells in Notebook 1 may replay cached outputs (see `content/cached_outputs.json`) so the demo stays on time during the talk. Delete the relevant cache labels to force live regeneration.
