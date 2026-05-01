@@ -61,4 +61,8 @@ All clinical content is fully synthetic. No real patient data, even de-identifie
 
 ## Workshop organizers
 
-Sophia Frangou, Martin Paulus, Logan Grosenick, Teddy Akiki, Thomas H. McCoy.
+- Sophia Frangou, MD, PhD &middot; Mount Sinai / UBC
+- Martin Paulus, MD &middot; Laureate Institute for Brain Research
+- Logan Grosenick, PhD &middot; Cornell
+- Teddy Akiki, MD &middot; Stanford
+- Thomas H. McCoy, MD &middot; Harvard / MGH

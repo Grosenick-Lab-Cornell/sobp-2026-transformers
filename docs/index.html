@@ -101,6 +101,30 @@ section { padding: 1.25rem 0 2rem; }
 }
 .setup ol li { margin: 0.4em 0; }
 
+/* ─── organizers ────────────────────────────────────────────────────── */
+.organizers {
+  max-width: 70ch;
+  margin: 0 auto;
+}
+.organizers h2 {
+  font-size: 0.85rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--teal-bright);
+  margin: 0 0 0.7em;
+  font-weight: 500;
+}
+.organizers ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  color: var(--ink);
+  font-size: 1.0rem;
+}
+.organizers li { margin: 0.35em 0; }
+.organizers li .affil { color: var(--dim); }
+
 /* ─── notebook cards ────────────────────────────────────────────────── */
 .cards {
   display: grid;
@@ -1095,6 +1119,17 @@ footer a:hover, footer a:focus { color: var(--ink); }
       </article>
 
     </div>
+  </section>
+
+  <section class="organizers" aria-label="Workshop organizers">
+    <h2>Workshop organizers</h2>
+    <ul>
+      <li>Sophia Frangou, MD, PhD <span class="affil">· Mount Sinai / UBC</span></li>
+      <li>Martin Paulus, MD <span class="affil">· Laureate Institute for Brain Research</span></li>
+      <li>Logan Grosenick, PhD <span class="affil">· Cornell</span></li>
+      <li>Teddy Akiki, MD <span class="affil">· Stanford</span></li>
+      <li>Thomas H. McCoy, MD <span class="affil">· Harvard / MGH</span></li>
+    </ul>
   </section>
 
 </main>
