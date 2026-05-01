@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Transformer &amp; LLM Basics with Relevance to Psychiatry</title>
-<meta name="description" content="A 45-minute introduction to LLM basics for the SOBP 2026 AI in Biomedical Sciences Workshop. Two Colab notebooks covering tokenization, positional encoding, context, RAG, schema-constrained output, and failure modes. Logan Grosenick, Weill Cornell Psychiatry.">
+<meta name="description" content="A 45-minute introduction to LLM basics for the SOBP 2026 AI in Biomedical Sciences Workshop. Two Colab notebooks covering tokenization, positional encoding, context, RAG, schema-constrained output, and failure modes.">
 <style>
 @font-face {
         font-family: 'Breip';
@@ -128,7 +128,14 @@ section { padding: 1.25rem 0 2rem; }
 
 .card h3 {
   font-size: 1.45rem;
-  margin: 0 0 0.6em;
+  margin: 0 0 0.3em;
+}
+
+.card .byline {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--dim);
+  margin: 0 0 0.9em;
 }
 
 .card p {
@@ -1008,8 +1015,6 @@ footer a:hover, footer a:focus { color: var(--ink); }
         stroke="#06B6D4" stroke-width="3" fill="none" stroke-linecap="round"/>
 
   <text x="700.0" y="300" class="subtitle">AI in Biomedical Sciences Workshop (SOBP)</text>
-  <text x="700.0" y="330" class="meta">Logan Grosenick · Weill Cornell Psychiatry · grosenicklab.org</text>
-
 </svg>
 
 </div>
@@ -1017,14 +1022,14 @@ footer a:hover, footer a:focus { color: var(--ink); }
 <main>
 
   <section class="abstract" aria-label="Abstract">
-    <p>Intro to LLMs for psychiatric research: tokenization, positional encoding, context, retrieval, and structured output. Two Colab notebooks demonstrate each on a small open-source model (Phi-3.5 mini) running locally. No API keys, no accounts.</p>
+    <p>Intro to LLMs for psychiatric research: tokenization, positional encoding, context, retrieval, structured output, and computable phenotyping. Notebooks run on a small open-source model (Phi-3.5 mini) or in R via Ollama. No API keys, no accounts.</p>
   </section>
 
   <section class="setup" aria-label="Setup">
     <h2>Before you run</h2>
     <ol>
-      <li>Click <strong>Open in Colab</strong> on either notebook below.</li>
-      <li>In Colab, switch to a GPU runtime: <strong>Runtime &rarr; Change runtime type &rarr; T4 GPU</strong>.</li>
+      <li>Click <strong>Open in Colab</strong> on a notebook below.</li>
+      <li>For Notebooks 1 and 2, switch to a GPU runtime: <strong>Runtime &rarr; Change runtime type &rarr; T4 GPU</strong>.</li>
       <li><strong>Run all cells.</strong> The first setup cell installs dependencies and downloads the model (about 1 to 2 minutes on a T4); subsequent cells run in seconds.</li>
     </ol>
   </section>
@@ -1035,6 +1040,7 @@ footer a:hover, footer a:focus { color: var(--ink); }
       <article class="card">
         <span class="label">Notebook 1</span>
         <h3>How LLMs see clinical text</h3>
+        <p class="byline">Logan Grosenick, PhD · Cornell</p>
         <p>Tokenization, positional encoding, and the context window. Live demo on a synthetic 28-document psychiatric chart.</p>
         <div class="btns">
           <a class="btn btn-primary"
@@ -1049,6 +1055,7 @@ footer a:hover, footer a:focus { color: var(--ink); }
       <article class="card">
         <span class="label">Notebook 2</span>
         <h3>Using LLMs for psychiatric research</h3>
+        <p class="byline">Logan Grosenick, PhD · Cornell</p>
         <p>Retrieval-augmented generation, schema-constrained extraction, and four failure modes: hallucination, lost-in-the-middle, PHI leakage, prompt injection.</p>
         <div class="btns">
           <a class="btn btn-primary"
@@ -1063,7 +1070,8 @@ footer a:hover, footer a:focus { color: var(--ink); }
       <article class="card">
         <span class="label">Notebook 3</span>
         <h3>Computable phenotyping with LLMs</h3>
-        <p>RDoC dimensional scoring and PHQ-9 estimation from clinical notes, three approaches (bag-of-words, SQL, LLM via Ollama), in R. By Tom McCoy (MGH).</p>
+        <p class="byline">Thomas H. McCoy, MD · Harvard / MGH</p>
+        <p>RDoC dimensional scoring and PHQ-9 estimation from clinical notes, three approaches (bag-of-words, SQL, LLM via Ollama), in R.</p>
         <div class="btns">
           <a class="btn btn-primary"
              href="https://colab.research.google.com/github/Grosenick-Lab-Cornell/sobp-2026-transformers/blob/main/notebooks/McCoy_SOBP_2026.ipynb"
@@ -1074,14 +1082,24 @@ footer a:hover, footer a:focus { color: var(--ink); }
         </div>
       </article>
 
+      <article class="card">
+        <span class="label">Toolkit</span>
+        <h3>Slurm Whisperer</h3>
+        <p class="byline">Teddy Akiki, MD · Stanford</p>
+        <p>Slash-command toolkit for driving a SLURM cluster from Claude Code (push, submit, status, pull, run). A thin executor subagent keeps cluster-op output out of your main context.</p>
+        <div class="btns">
+          <a class="btn btn-primary"
+             href="https://github.com/Grosenick-Lab-Cornell/sobp-2026-transformers/tree/main/slurm-whisperer"
+             target="_blank" rel="noopener">View on GitHub</a>
+        </div>
+      </article>
+
     </div>
   </section>
 
 </main>
 
 <footer>
-  <p>Logan Grosenick, Weill Cornell Psychiatry</p>
-  <p><a href="https://grosenicklab.org" target="_blank" rel="noopener">grosenicklab.org</a></p>
   <p><a href="https://github.com/Grosenick-Lab-Cornell/sobp-2026-transformers" target="_blank" rel="noopener">github.com/Grosenick-Lab-Cornell/sobp-2026-transformers</a></p>
 </footer>
 
