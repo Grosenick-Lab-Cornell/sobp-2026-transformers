@@ -59,7 +59,7 @@ All clinical content is fully synthetic. No real patient data, even de-identifie
 
 ---
 
-## Workshop organizers
+## Workshop Organizers and Speakers
 
 - Sophia Frangou, MD, PhD &middot; Mount Sinai / UBC
 - Martin Paulus, MD &middot; Laureate Institute for Brain Research
