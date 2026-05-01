@@ -1,0 +1,7 @@
+#!/bin/bash -l
+# mrl-run: module-load wrapper for ad-hoc commands on the cluster
+# Usage: ~/bin/mrl-run scontrol show job 12345
+SLURM_MODULE=$(awk '/^modules:/{f=1;next} f&&/^  slurm:/{print $2;exit}' "$HOME/.mrl/config.yaml" 2>/dev/null)
+module load "${SLURM_MODULE:-slurm/slurm/25.05.2}" 2>/dev/null
+set -euo pipefail
+exec "$@"

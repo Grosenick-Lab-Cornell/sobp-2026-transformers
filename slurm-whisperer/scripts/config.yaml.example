@@ -1,0 +1,37 @@
+# SLURM cluster configuration
+# Deployed to ~/.mrl/config.yaml on the cluster login node.
+# Single source of truth for all mrl-* scripts.
+#
+# Copy to scripts/config.yaml (or wherever you deploy from) and fill in.
+
+user: <YOUR_CLUSTER_USERNAME>
+project_dir: /projects/<PROJECT_ID>/<YOUR_REPO>
+scratch_dir: /scratch/<PROJECT_ID>
+
+# NOTE: mrl-run / mrl-nodes parse `modules.slurm` with awk.
+# Use exactly two-space indent, no quotes around the value, no inline comments.
+modules:
+  # Match what `module avail` shows on your cluster.
+  slurm: slurm/slurm/25.05.2
+  cudnn: cudnn/cuda12/9.3.0.75
+
+partitions:
+  # Add as many partitions as you use. Names are arbitrary --- they are looked
+  # up by name from the `--partition=` flag at submit time.
+  preempt:
+    account: <YOUR_SLURM_ACCOUNT>
+    qos: normal
+    default_time: "04:00:00"
+    max_time: "12:00:00"
+  batch:
+    account: <YOUR_SLURM_ACCOUNT>
+    qos: medium
+    default_time: "24:00:00"
+    max_time: "48:00:00"
+
+defaults:
+  partition: preempt
+  gpus: 1
+  cpus: 2
+  mem: 32G
+  train_script: scripts/train.py

@@ -68,9 +68,11 @@ secrets.json
 # ─── Claude Code session artifacts ───────────────────────────
 # Local operational brief and Claude Code's per-repo settings.
 # Useful for ongoing Claude sessions, not part of the project's
-# canonical artifacts.
+# canonical artifacts. Scoped to the repo root so nested .claude/
+# directories (e.g. slurm-whisperer/.claude/, which is shipped
+# content) are still tracked.
 CLAUDE.md
-.claude/
+/.claude/
 
 # ─── Design notes / pre-build specs ──────────────────────────
 # Internal cell-by-cell design notes from the chat-side phase.

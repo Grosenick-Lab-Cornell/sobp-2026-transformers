@@ -1,0 +1,914 @@
+#!/bin/bash -l
+# mrl-status: Show SLURM job status and training progress.
+# Pure bash — single module load, batched SLURM queries.
+#
+# Usage:
+#   mrl-status                  # all sections
+#   mrl-status --running        # only running jobs
+#   mrl-status --json           # JSON output only
+#   mrl-status --pattern=GLOB   # filter by experiment name
+set -euo pipefail
+
+# ---------------------------------------------------------------------------
+# Parse CLI args
+# ---------------------------------------------------------------------------
+OPT_RUNNING=0
+OPT_JSON=0
+OPT_PATTERN=""
+
+for arg in "$@"; do
+    case "$arg" in
+        --running)   OPT_RUNNING=1 ;;
+        --json)      OPT_JSON=1 ;;
+        --pattern=*) OPT_PATTERN="${arg#--pattern=}" ;;
+        *)           echo "Unknown argument: $arg" >&2; exit 1 ;;
+    esac
+done
+
+# ---------------------------------------------------------------------------
+# Read config (~/.mrl/config.yaml) — flat YAML, simple awk
+# ---------------------------------------------------------------------------
+CONFIG="$HOME/.mrl/config.yaml"
+if [[ ! -f "$CONFIG" ]]; then
+    echo "ERROR: Config not found: $CONFIG" >&2
+    exit 1
+fi
+
+cfg_get() {
+    # cfg_get "key" — returns value for top-level "key: value"
+    awk -v key="$1" '$0 ~ "^"key":" { sub(/^[^:]+:[[:space:]]*/, ""); gsub(/["\047]/, ""); print; exit }' "$CONFIG"
+}
+cfg_get_nested() {
+    # cfg_get_nested "parent" "child" — for one level of nesting (2-space indent)
+    awk -v p="$1" -v c="$2" '
+        $0 ~ "^"p":" { in_block=1; next }
+        in_block && /^[^ ]/ { exit }
+        in_block && $0 ~ "^  "c":" { sub(/^[^:]+:[[:space:]]*/, ""); gsub(/["\047]/, ""); print; exit }
+    ' "$CONFIG"
+}
+
+USER_NAME=$(cfg_get "user")
+SCRATCH_DIR=$(cfg_get "scratch_dir")
+SLURM_MODULE=$(cfg_get_nested "modules" "slurm")
+DEF_GPUS=$(cfg_get_nested "defaults" "gpus")
+DEF_CPUS=$(cfg_get_nested "defaults" "cpus")
+DEF_MEM=$(cfg_get_nested "defaults" "mem")
+
+# ---------------------------------------------------------------------------
+# Load SLURM module ONCE
+# ---------------------------------------------------------------------------
+module load "$SLURM_MODULE" 2>/dev/null
+
+# ---------------------------------------------------------------------------
+# Time helpers
+# ---------------------------------------------------------------------------
+runtime_to_secs() {
+    # Convert D-HH:MM:SS or HH:MM:SS or MM:SS to seconds
+    local t="$1"
+    [[ -z "$t" || "$t" == "--" ]] && echo 0 && return
+    local days=0 h=0 m=0 s=0
+    if [[ "$t" == *-* ]]; then
+        days="${t%%-*}"
+        t="${t#*-}"
+    fi
+    IFS=: read -ra parts <<< "$t"
+    case ${#parts[@]} in
+        3) h="${parts[0]}"; m="${parts[1]}"; s="${parts[2]}" ;;
+        2) m="${parts[0]}"; s="${parts[1]}" ;;
+        1) s="${parts[0]}" ;;
+    esac
+    # Strip leading zeros to avoid octal interpretation
+    days=$((10#$days)); h=$((10#$h)); m=$((10#$m)); s=$((10#$s))
+    echo $(( days*86400 + h*3600 + m*60 + s ))
+}
+
+fmt_duration() {
+    # Format seconds as compact string: 1h34m, 5m59s, 26h30m
+    local secs=$1
+    if (( secs < 0 )); then secs=0; fi
+    local d=$(( secs / 86400 ))
+    local h=$(( (secs % 86400) / 3600 ))
+    local m=$(( (secs % 3600) / 60 ))
+    local s=$(( secs % 60 ))
+    if (( d > 0 )); then
+        printf '%dh%02dm\n' "$(( d*24 + h ))" "$m"
+    elif (( h > 0 )); then
+        printf '%dh%02dm\n' "$h" "$m"
+    else
+        printf '%dm%02ds\n' "$m" "$s"
+    fi
+}
+
+fmt_duration_no_secs() {
+    # Like fmt_duration but drops seconds — for wall time where seconds are noise
+    local secs=$1
+    if (( secs < 0 )); then secs=0; fi
+    local d=$(( secs / 86400 ))
+    local h=$(( (secs % 86400) / 3600 ))
+    local m=$(( (secs % 3600) / 60 ))
+    if (( d > 0 )); then
+        printf '%dh%02dm\n' "$(( d*24 + h ))" "$m"
+    elif (( h > 0 )); then
+        printf '%dh%02dm\n' "$h" "$m"
+    else
+        printf '%dm\n' "$m"
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# Train log parsing
+# ---------------------------------------------------------------------------
+parse_train_log() {
+    # Sets global variables: tl_epoch, tl_total, tl_best_epoch, tl_best_val,
+    # tl_patience, tl_max_patience, tl_loss, tl_early_stopped
+    local logfile="$1"
+    tl_epoch="" ; tl_total="" ; tl_best_epoch="" ; tl_best_val=""
+    tl_patience="" ; tl_max_patience="" ; tl_loss="" ; tl_early_stopped=0
+
+    [[ ! -f "$logfile" ]] && return
+
+    # Use tac + grep -m1 to get LAST occurrence efficiently
+    local last_epoch_line last_total_line last_best_line last_patience_line
+
+    last_epoch_line=$(tac "$logfile" | grep -m1 -oP 'Epoch\s+\K\d+/\d+' 2>/dev/null || true)
+    if [[ -n "$last_epoch_line" ]]; then
+        tl_epoch="${last_epoch_line%/*}"
+        tl_total="${last_epoch_line#*/}"
+    fi
+
+    # Total epochs from config log line (fallback)
+    if [[ -z "$tl_total" ]]; then
+        last_total_line=$(tac "$logfile" | grep -m1 -oP 'Epochs:\s*\K\d+' 2>/dev/null || true)
+        [[ -n "$last_total_line" ]] && tl_total="$last_total_line"
+    fi
+
+    # Best model: "New best val_session_gap: 0.4710 at epoch 9"
+    last_best_line=$(tac "$logfile" | grep -m1 'New best' 2>/dev/null || true)
+    if [[ -n "$last_best_line" ]]; then
+        tl_best_val=$(echo "$last_best_line" | grep -oP 'New best [^:]+:\s*\K[\d.]+' 2>/dev/null || true)
+        tl_best_epoch=$(echo "$last_best_line" | grep -oP 'at epoch\s*\K\d+' 2>/dev/null || true)
+    fi
+
+    # Patience: "Patience: 5/15"
+    last_patience_line=$(tac "$logfile" | grep -m1 -ioP '[Pp]atience:\s*\K\d+/\d+' 2>/dev/null || true)
+    if [[ -n "$last_patience_line" ]]; then
+        tl_patience="${last_patience_line%/*}"
+        tl_max_patience="${last_patience_line#*/}"
+    fi
+
+    # Loss: "Loss: 1.6056"
+    local last_loss_line
+    last_loss_line=$(tac "$logfile" | grep -m1 -oP 'Loss:\s*\K[\d.]+' 2>/dev/null || true)
+    [[ -n "$last_loss_line" ]] && tl_loss="$last_loss_line"
+
+    # Early stopping
+    if grep -q 'Early stopping triggered' "$logfile" 2>/dev/null; then
+        tl_early_stopped=1
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# Epoch rate from log timestamps (for accurate ETA)
+# ---------------------------------------------------------------------------
+compute_epoch_rate() {
+    # Sets globals: tl_sec_per_epoch, tl_last_epoch_ts
+    # Uses timestamps from epoch lines in the CURRENT SLURM run (after last "Starting training")
+    local logfile="$1"
+    tl_sec_per_epoch="" ; tl_last_epoch_ts=""
+
+    [[ ! -f "$logfile" ]] && return
+
+    # Find line number of the LAST "Starting training" marker (current SLURM run)
+    local start_line
+    start_line=$(grep -nP 'Starting training' "$logfile" 2>/dev/null | tail -1 | cut -d: -f1 || true)
+    [[ -z "$start_line" ]] && return
+
+    # Get last 2 epoch lines after the start marker
+    local epoch_lines
+    epoch_lines=$(tail -n +"$start_line" "$logfile" | grep -P '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.*Epoch\s+\d+/\d+' 2>/dev/null | tail -2 || true)
+
+    local line_count
+    line_count=$(echo "$epoch_lines" | grep -c . 2>/dev/null || true)
+    (( line_count < 2 )) && return
+
+    local line1 line2
+    line1=$(echo "$epoch_lines" | head -1)
+    line2=$(echo "$epoch_lines" | tail -1)
+
+    # Parse timestamps
+    local ts1_str ts2_str
+    ts1_str=$(echo "$line1" | grep -oP '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}' 2>/dev/null || true)
+    ts2_str=$(echo "$line2" | grep -oP '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}' 2>/dev/null || true)
+    [[ -z "$ts1_str" || -z "$ts2_str" ]] && return
+
+    local ts1_epoch ts2_epoch
+    ts1_epoch=$(date -d "$ts1_str" +%s 2>/dev/null || true)
+    ts2_epoch=$(date -d "$ts2_str" +%s 2>/dev/null || true)
+    [[ -z "$ts1_epoch" || -z "$ts2_epoch" ]] && return
+
+    # Parse epoch numbers
+    local ep1 ep2
+    ep1=$(echo "$line1" | grep -oP 'Epoch\s+\K\d+' 2>/dev/null || true)
+    ep2=$(echo "$line2" | grep -oP 'Epoch\s+\K\d+' 2>/dev/null || true)
+    [[ -z "$ep1" || -z "$ep2" ]] && return
+
+    local ep_diff ts_diff
+    ep_diff=$(( ep2 - ep1 ))
+    ts_diff=$(( ts2_epoch - ts1_epoch ))
+    (( ep_diff <= 0 || ts_diff <= 0 )) && return
+
+    tl_sec_per_epoch=$(( ts_diff / ep_diff ))
+    tl_last_epoch_ts="$ts2_epoch"
+}
+
+# ---------------------------------------------------------------------------
+# GPU usage parsing
+# ---------------------------------------------------------------------------
+parse_gpu_usage() {
+    # Sets: gpu_util, gpu_mem_used_g, gpu_mem_total_g
+    local csvfile="$1"
+    gpu_util="" ; gpu_mem_used_g="" ; gpu_mem_total_g=""
+
+    [[ ! -f "$csvfile" ]] && return
+
+    local last
+    last=$(tail -1 "$csvfile" 2>/dev/null || true)
+    [[ -z "$last" || "$last" == *"timestamp"* ]] && return
+
+    # Fields: timestamp, util.gpu [%], util.memory [%], memory.used [MiB], memory.total [MiB]
+    IFS=, read -ra fields <<< "$last"
+    (( ${#fields[@]} < 5 )) && return
+
+    gpu_util=$(echo "${fields[1]}" | grep -oP '\d+' 2>/dev/null || true)
+    local used_mib total_mib
+    used_mib=$(echo "${fields[3]}" | grep -oP '\d+' 2>/dev/null || true)
+    total_mib=$(echo "${fields[4]}" | grep -oP '\d+' 2>/dev/null || true)
+
+    [[ -n "$used_mib" ]] && gpu_mem_used_g=$(( used_mib / 1024 ))
+    [[ -n "$total_mib" ]] && gpu_mem_total_g=$(( total_mib / 1024 ))
+}
+
+# ---------------------------------------------------------------------------
+# CPU usage parsing (vmstat)
+# ---------------------------------------------------------------------------
+parse_cpu_usage() {
+    # Sets: cpu_util
+    local logfile="$1"
+    cpu_util=""
+
+    [[ ! -f "$logfile" ]] && return
+
+    # vmstat columns: r b swpd free buff cache si so bi bo in cs us sy id wa st ...
+    # We need the 'id' (idle) column — 15th field in vmstat output
+    # Get last numeric line (skip header lines that start with 'procs' or ' r')
+    local last_line idle
+    last_line=$(tac "$logfile" | grep -m1 -P '^\s*\d' 2>/dev/null || true)
+    [[ -z "$last_line" ]] && return
+
+    # Extract idle% — it's the 15th field
+    idle=$(echo "$last_line" | awk '{print $15}' 2>/dev/null || true)
+    [[ -n "$idle" ]] && cpu_util=$(( 100 - idle ))
+}
+
+# ---------------------------------------------------------------------------
+# Pattern matching helper (fnmatch-like glob)
+# ---------------------------------------------------------------------------
+matches_pattern() {
+    # Returns 0 if name matches pattern (or pattern is empty)
+    local name="$1"
+    [[ -z "$OPT_PATTERN" ]] && return 0
+    # Use bash extended globbing
+    # shellcheck disable=SC2254
+    case "$name" in
+        $OPT_PATTERN) return 0 ;;
+    esac
+    return 1
+}
+
+# ---------------------------------------------------------------------------
+# Parse RAM from sstat MaxRSS value (e.g. "8289176K")
+# ---------------------------------------------------------------------------
+parse_maxrss() {
+    local raw="$1"
+    [[ -z "$raw" ]] && echo "" && return
+    local num unit
+    num=$(echo "$raw" | grep -oP '[\d.]+' 2>/dev/null || true)
+    unit=$(echo "$raw" | grep -oP '[KMGT]' 2>/dev/null || true)
+    [[ -z "$num" ]] && echo "" && return
+    case "$unit" in
+        K) echo "$num" | awk '{printf "%.0fG", $1/1048576}' ;;
+        M) echo "$num" | awk '{printf "%.0fG", $1/1024}' ;;
+        G) echo "$num" | awk '{printf "%.0fG", $1}' ;;
+        T) echo "$num" | awk '{printf "%.0fG", $1*1024}' ;;
+        *) echo "${num}" ;;
+    esac
+}
+
+# ---------------------------------------------------------------------------
+# JSON helpers
+# ---------------------------------------------------------------------------
+json_str() { printf '"%s"' "$1"; }
+json_num_or_null() { [[ -n "$1" ]] && echo "$1" || echo "null"; }
+json_str_or_null() { [[ -n "$1" ]] && printf '"%s"' "$1" || echo "null"; }
+
+# ===========================================================================
+# MAIN
+# ===========================================================================
+
+NOW_DATE=$(date '+%Y-%m-%d %H:%M')
+NOW_ISO=$(date -Iseconds)
+NOW_EPOCH=$(date +%s)
+
+# ---------------------------------------------------------------------------
+# 1. squeue — all running + pending jobs
+# ---------------------------------------------------------------------------
+SQUEUE_OUT=$(squeue -u "$USER_NAME" -o "%i|%j|%P|%T|%M|%l|%C|%b|%R" --noheader 2>/dev/null || true)
+
+# Arrays for running and pending jobs
+declare -a RUN_IDS=() RUN_NAMES=() RUN_PARTS=() RUN_RUNTIMES=() RUN_LIMITS=() RUN_CPUS=() RUN_NODES=()
+declare -a PND_IDS=() PND_NAMES=() PND_PARTS=() PND_REASONS=()
+
+while IFS='|' read -r jid jname jpart jstate jruntime jlimit jcpus jgres jnode; do
+    [[ -z "$jid" ]] && continue
+    # Trim whitespace
+    jid="${jid// /}"; jname="${jname// /}"; jpart="${jpart// /}"; jstate="${jstate// /}"
+    jruntime="${jruntime// /}"; jlimit="${jlimit// /}"; jnode="${jnode// /}"
+
+    matches_pattern "$jname" || continue
+
+    if [[ "$jstate" == "RUNNING" ]]; then
+        RUN_IDS+=("$jid")
+        RUN_NAMES+=("$jname")
+        RUN_PARTS+=("$jpart")
+        RUN_RUNTIMES+=("$jruntime")
+        RUN_LIMITS+=("$jlimit")
+        RUN_CPUS+=("$jcpus")
+        RUN_NODES+=("$jnode")
+    elif [[ "$jstate" == "PENDING" ]]; then
+        PND_IDS+=("$jid")
+        PND_NAMES+=("$jname")
+        PND_PARTS+=("$jpart")
+        PND_REASONS+=("$jnode")
+    fi
+done <<< "$SQUEUE_OUT"
+
+# ---------------------------------------------------------------------------
+# 2. scontrol — batch all running job IDs into one call
+# ---------------------------------------------------------------------------
+declare -A SC_RUNTIME SC_LIMIT SC_NODE SC_GPUS SC_CPUS SC_MEM
+
+if (( ${#RUN_IDS[@]} > 0 )); then
+    SC_IDS=$(IFS=,; echo "${RUN_IDS[*]}")
+    SCONTROL_OUT=$(scontrol show job "$SC_IDS" 2>/dev/null || true)
+
+    # Split on JobId= boundaries and parse each block
+    current_jid=""
+    while IFS= read -r line; do
+        if [[ "$line" =~ JobId=([0-9]+) ]]; then
+            current_jid="${BASH_REMATCH[1]}"
+        fi
+        [[ -z "$current_jid" ]] && continue
+
+        # Parse key=value tokens from each line
+        for token in $line; do
+            case "$token" in
+                RunTime=*)    SC_RUNTIME["$current_jid"]="${token#RunTime=}" ;;
+                TimeLimit=*)  SC_LIMIT["$current_jid"]="${token#TimeLimit=}" ;;
+                NodeList=*)   SC_NODE["$current_jid"]="${token#NodeList=}" ;;
+            esac
+            # Parse GPU count from ReqTRES
+            if [[ "$token" == ReqTRES=* ]]; then
+                local_tres="${token#ReqTRES=}"
+                if [[ "$local_tres" =~ gres/gpu=([0-9]+) ]]; then
+                    SC_GPUS["$current_jid"]="${BASH_REMATCH[1]}"
+                fi
+                if [[ "$local_tres" =~ cpu=([0-9]+) ]]; then
+                    SC_CPUS["$current_jid"]="${BASH_REMATCH[1]}"
+                fi
+                if [[ "$local_tres" =~ mem=([0-9]+[KMGT]?) ]]; then
+                    SC_MEM["$current_jid"]="${BASH_REMATCH[1]}"
+                fi
+            fi
+            if [[ "$token" == AllocTRES=* ]]; then
+                local_tres="${token#AllocTRES=}"
+                if [[ "$local_tres" =~ mem=([0-9]+[KMGT]?) ]]; then
+                    SC_MEM["$current_jid"]="${BASH_REMATCH[1]}"
+                fi
+            fi
+        done
+    done <<< "$SCONTROL_OUT"
+
+    # Update arrays with scontrol data
+    for i in "${!RUN_IDS[@]}"; do
+        jid="${RUN_IDS[$i]}"
+        [[ -n "${SC_RUNTIME[$jid]:-}" ]] && RUN_RUNTIMES[$i]="${SC_RUNTIME[$jid]}"
+        [[ -n "${SC_LIMIT[$jid]:-}" ]] && RUN_LIMITS[$i]="${SC_LIMIT[$jid]}"
+        [[ -n "${SC_NODE[$jid]:-}" ]] && RUN_NODES[$i]="${SC_NODE[$jid]}"
+    done
+fi
+
+# ---------------------------------------------------------------------------
+# 3. sstat — batch all running jobs for RAM usage
+# ---------------------------------------------------------------------------
+declare -A SSTAT_RAM
+
+if (( ${#RUN_IDS[@]} > 0 )); then
+    SSTAT_IDS=""
+    for jid in "${RUN_IDS[@]}"; do
+        [[ -n "$SSTAT_IDS" ]] && SSTAT_IDS+=","
+        SSTAT_IDS+="${jid}.batch"
+    done
+    SSTAT_OUT=$(sstat -j "$SSTAT_IDS" --format=JobID,MaxRSS --noheader 2>/dev/null || true)
+
+    while read -r sjid smaxrss; do
+        [[ -z "$sjid" ]] && continue
+        # Strip .batch suffix to get numeric job ID
+        local_jid="${sjid%.batch}"
+        SSTAT_RAM["$local_jid"]="$smaxrss"
+    done <<< "$SSTAT_OUT"
+fi
+
+# ---------------------------------------------------------------------------
+# 4. sacct — recent 24h jobs
+# ---------------------------------------------------------------------------
+declare -a SACCT_IDS=() SACCT_NAMES=() SACCT_PARTS=() SACCT_STATES=() SACCT_ELAPSED=() SACCT_EXITS=()
+
+if (( OPT_RUNNING == 0 )); then
+    SACCT_START=$(date -d "24 hours ago" +%Y-%m-%d 2>/dev/null || date +%Y-%m-%d)
+    SACCT_OUT=$(sacct -u "$USER_NAME" --starttime="$SACCT_START" \
+        -o "JobID,JobName%60,Partition,State,Elapsed,ExitCode" --noheader -X 2>/dev/null || true)
+
+    # Build set of running/pending IDs to exclude
+    declare -A ACTIVE_IDS
+    for jid in "${RUN_IDS[@]}" "${PND_IDS[@]}"; do
+        ACTIVE_IDS["$jid"]=1
+    done
+
+    while read -r sjid sname spart sstate selapsed sexit rest; do
+        [[ -z "$sjid" ]] && continue
+        [[ -n "${ACTIVE_IDS[$sjid]:-}" ]] && continue
+        [[ "$sstate" == "RUNNING" || "$sstate" == "PENDING" ]] && continue
+        matches_pattern "$sname" || continue
+
+        SACCT_IDS+=("$sjid")
+        SACCT_NAMES+=("$sname")
+        SACCT_PARTS+=("$spart")
+        SACCT_STATES+=("$sstate")
+        SACCT_ELAPSED+=("$selapsed")
+        SACCT_EXITS+=("$sexit")
+    done <<< "$SACCT_OUT"
+fi
+
+# ---------------------------------------------------------------------------
+# Parse training progress for running jobs
+# ---------------------------------------------------------------------------
+declare -a R_EPOCH=() R_TOTAL=() R_BEST_EP=() R_BEST_VAL=() R_PAT=() R_MAXPAT=() R_LOSS=()
+declare -a R_GPU_UTIL=() R_GPU_USED=() R_GPU_TOTAL=() R_CPU_UTIL=() R_RAM_USED=()
+declare -a R_ETA_H=() R_WALL_LEFT=() R_WARN=()
+
+for i in "${!RUN_IDS[@]}"; do
+    jid="${RUN_IDS[$i]}"
+    name="${RUN_NAMES[$i]}"
+    outdir="$SCRATCH_DIR/outputs/$name"
+
+    # Train log
+    parse_train_log "$outdir/train.log"
+    R_EPOCH+=("$tl_epoch")
+    R_TOTAL+=("$tl_total")
+    R_BEST_EP+=("$tl_best_epoch")
+    R_BEST_VAL+=("$tl_best_val")
+    R_PAT+=("$tl_patience")
+    R_MAXPAT+=("$tl_max_patience")
+    R_LOSS+=("$tl_loss")
+
+    # ETA calculation
+    runtime_secs=$(runtime_to_secs "${RUN_RUNTIMES[$i]}")
+    limit_secs=$(runtime_to_secs "${RUN_LIMITS[$i]}")
+    wall_left=$(( limit_secs - runtime_secs ))
+    R_WALL_LEFT+=("$wall_left")
+
+    local_eta=""
+    local_warn=""
+    if [[ -n "$tl_epoch" && -n "$tl_total" && "$tl_epoch" -gt 0 ]]; then
+        compute_epoch_rate "$outdir/train.log"
+        eta_secs=""
+
+        if [[ -n "$tl_sec_per_epoch" && "$tl_sec_per_epoch" -gt 0 && -n "$tl_last_epoch_ts" ]]; then
+            # Log-timestamp ETA: per-epoch rate from actual training timestamps
+            time_in_current=$(( NOW_EPOCH - tl_last_epoch_ts ))
+            remaining_in_current=$(( tl_sec_per_epoch - time_in_current ))
+            (( remaining_in_current < 0 )) && remaining_in_current=0
+            full_remaining=$(( tl_total - tl_epoch ))  # full epochs after current one completes
+            eta_secs=$(( remaining_in_current + full_remaining * tl_sec_per_epoch ))
+        fi
+
+        if [[ -n "$eta_secs" ]] && (( eta_secs > 0 )); then
+            local_eta=$(fmt_duration "$eta_secs")
+            if (( eta_secs > wall_left )); then
+                local_warn=" ⚠️"
+            fi
+        elif [[ -n "$eta_secs" ]] && (( eta_secs <= 0 )); then
+            local_eta="<1m"
+        fi
+    fi
+    R_ETA_H+=("$local_eta")
+    R_WARN+=("$local_warn")
+
+    # GPU usage
+    parse_gpu_usage "$outdir/gpu_usage.csv"
+    R_GPU_UTIL+=("$gpu_util")
+    R_GPU_USED+=("$gpu_mem_used_g")
+    R_GPU_TOTAL+=("$gpu_mem_total_g")
+
+    # CPU usage
+    parse_cpu_usage "$outdir/cpu_usage.log"
+    R_CPU_UTIL+=("$cpu_util")
+
+    # RAM from sstat
+    local_ram=""
+    if [[ -n "${SSTAT_RAM[$jid]:-}" ]]; then
+        local_ram=$(parse_maxrss "${SSTAT_RAM[$jid]}")
+    fi
+    R_RAM_USED+=("$local_ram")
+done
+
+# ---------------------------------------------------------------------------
+# Parse training progress for recent sacct jobs
+# ---------------------------------------------------------------------------
+declare -a RC_SEMANTIC=() RC_DURATION=() RC_EPOCH=() RC_TOTAL=()
+declare -a RC_BEST_EP=() RC_BEST_VAL=() RC_PAT=() RC_MAXPAT=()
+declare -a RC_IS_SHORT=()
+
+for i in "${!SACCT_IDS[@]}"; do
+    elapsed_secs=$(runtime_to_secs "${SACCT_ELAPSED[$i]}")
+    compact_dur=$(fmt_duration "$elapsed_secs")
+    RC_DURATION+=("$compact_dur")
+
+    if (( elapsed_secs < 60 )); then
+        # Skip sub-1-minute jobs (cancelled before start, etc.)
+        RC_IS_SHORT+=("skip")
+        RC_SEMANTIC+=("")
+        RC_EPOCH+=(""); RC_TOTAL+=("")
+        RC_BEST_EP+=(""); RC_BEST_VAL+=("")
+        RC_PAT+=(""); RC_MAXPAT+=("")
+        continue
+    fi
+
+    if (( elapsed_secs < 600 )); then
+        RC_IS_SHORT+=("1")
+        RC_SEMANTIC+=("")
+        RC_EPOCH+=(""); RC_TOTAL+=("")
+        RC_BEST_EP+=(""); RC_BEST_VAL+=("")
+        RC_PAT+=(""); RC_MAXPAT+=("")
+        continue
+    fi
+
+    RC_IS_SHORT+=("0")
+    name="${SACCT_NAMES[$i]}"
+    state="${SACCT_STATES[$i]}"
+    exitcode="${SACCT_EXITS[$i]}"
+    outdir="$SCRATCH_DIR/outputs/$name"
+
+    parse_train_log "$outdir/train.log"
+    RC_EPOCH+=("$tl_epoch")
+    RC_TOTAL+=("$tl_total")
+    RC_BEST_EP+=("$tl_best_epoch")
+    RC_BEST_VAL+=("$tl_best_val")
+    RC_PAT+=("$tl_patience")
+    RC_MAXPAT+=("$tl_max_patience")
+
+    # Derive semantic status
+    local_semantic="$state"
+    case "$state" in
+        COMPLETED)
+            if [[ "$exitcode" != "0:0" ]]; then
+                local_semantic="FAILED"
+            elif (( tl_early_stopped == 1 )); then
+                local_semantic="EARLY_STOP"
+            elif [[ -n "$tl_epoch" && -n "$tl_total" && "$tl_epoch" -eq "$tl_total" ]]; then
+                local_semantic="COMPLETED"
+            else
+                local_semantic="COMPLETED"
+            fi
+            ;;
+        TIMEOUT)     local_semantic="TIMEOUT" ;;
+        PREEMPTED)   local_semantic="PREEMPTED" ;;
+        *CANCELLED*) local_semantic="CANCELLED" ;;
+        FAILED)      local_semantic="FAILED" ;;
+    esac
+    RC_SEMANTIC+=("$local_semantic")
+done
+
+# ===========================================================================
+# JSON OUTPUT
+# ===========================================================================
+
+if (( OPT_JSON == 1 )); then
+    # ---- JSON output ----
+    echo "{"
+    echo "  \"timestamp\": \"$NOW_ISO\","
+
+    # -- Running --
+    echo "  \"running\": ["
+    for i in "${!RUN_IDS[@]}"; do
+        (( i > 0 )) && echo "    ,"
+        jid="${RUN_IDS[$i]}"
+        n_gpus="${SC_GPUS[$jid]:-$DEF_GPUS}"
+        n_cpus="${SC_CPUS[$jid]:-$DEF_CPUS}"
+        alloc_mem="${SC_MEM[$jid]:-$DEF_MEM}"
+        echo "    {"
+        echo "      \"job_id\": ${RUN_IDS[$i]},"
+        echo "      \"experiment\": \"${RUN_NAMES[$i]}\","
+        echo "      \"partition\": \"${RUN_PARTS[$i]}\","
+        echo "      \"node\": \"${RUN_NODES[$i]}\","
+        echo "      \"runtime\": \"${RUN_RUNTIMES[$i]}\","
+        echo "      \"time_limit\": \"${RUN_LIMITS[$i]}\","
+        echo "      \"epoch\": $(json_num_or_null "${R_EPOCH[$i]}"),"
+        echo "      \"total_epochs\": $(json_num_or_null "${R_TOTAL[$i]}"),"
+        echo "      \"best_epoch\": $(json_num_or_null "${R_BEST_EP[$i]}"),"
+        echo "      \"best_metric\": $(json_num_or_null "${R_BEST_VAL[$i]}"),"
+        echo "      \"patience\": $(json_num_or_null "${R_PAT[$i]}"),"
+        echo "      \"max_patience\": $(json_num_or_null "${R_MAXPAT[$i]}"),"
+        echo "      \"eta_hours\": $(json_num_or_null "${R_ETA_H[$i]}"),"
+        echo "      \"wall_left_secs\": ${R_WALL_LEFT[$i]},"
+        echo "      \"gpu_util\": $(json_num_or_null "${R_GPU_UTIL[$i]}"),"
+        echo "      \"gpu_mem_used_gb\": $(json_num_or_null "${R_GPU_USED[$i]}"),"
+        echo "      \"gpu_mem_total_gb\": $(json_num_or_null "${R_GPU_TOTAL[$i]}"),"
+        echo "      \"gpus\": $n_gpus,"
+        echo "      \"cpu_util\": $(json_num_or_null "${R_CPU_UTIL[$i]}"),"
+        echo "      \"cpus\": $n_cpus,"
+        echo "      \"ram_used\": $(json_str_or_null "${R_RAM_USED[$i]}"),"
+        echo "      \"ram_allocated\": \"$alloc_mem\""
+        echo "    }"
+    done
+    echo "  ],"
+
+    # -- Recent (>=10min) --
+    echo "  \"recent\": ["
+    first=1
+    for i in "${!SACCT_IDS[@]}"; do
+        [[ "${RC_IS_SHORT[$i]}" == "1" ]] && continue
+        (( first == 0 )) && echo "    ,"
+        first=0
+        echo "    {"
+        echo "      \"job_id\": ${SACCT_IDS[$i]},"
+        echo "      \"experiment\": \"${SACCT_NAMES[$i]}\","
+        echo "      \"partition\": \"${SACCT_PARTS[$i]}\","
+        echo "      \"state\": \"${SACCT_STATES[$i]}\","
+        echo "      \"semantic_state\": \"${RC_SEMANTIC[$i]}\","
+        echo "      \"elapsed\": \"${SACCT_ELAPSED[$i]}\","
+        echo "      \"exitcode\": \"${SACCT_EXITS[$i]}\","
+        echo "      \"epoch\": $(json_num_or_null "${RC_EPOCH[$i]}"),"
+        echo "      \"total_epochs\": $(json_num_or_null "${RC_TOTAL[$i]}"),"
+        echo "      \"best_epoch\": $(json_num_or_null "${RC_BEST_EP[$i]}"),"
+        echo "      \"best_metric\": $(json_num_or_null "${RC_BEST_VAL[$i]}"),"
+        echo "      \"patience\": $(json_num_or_null "${RC_PAT[$i]}"),"
+        echo "      \"max_patience\": $(json_num_or_null "${RC_MAXPAT[$i]}")"
+        echo "    }"
+    done
+    echo "  ],"
+
+    # -- Recent short (<10min) — grouped --
+    echo "  \"recent_short\": ["
+    declare -A JS_LATEST JS_COUNT JS_PART JS_DUR JS_STATE
+    declare -a JS_KEYS_ORDERED=()
+    for i in "${!SACCT_IDS[@]}"; do
+        [[ "${RC_IS_SHORT[$i]}" != "1" ]] && continue
+        key="${SACCT_NAMES[$i]}|${SACCT_STATES[$i]}"
+        if [[ -z "${JS_LATEST[$key]:-}" ]]; then
+            JS_KEYS_ORDERED+=("$key")
+        fi
+        JS_LATEST["$key"]="${SACCT_IDS[$i]}"
+        JS_COUNT["$key"]=$(( ${JS_COUNT[$key]:-0} + 1 ))
+        JS_PART["$key"]="${SACCT_PARTS[$i]}"
+        JS_DUR["$key"]="${RC_DURATION[$i]}"
+    done
+    first=1
+    for key in "${JS_KEYS_ORDERED[@]}"; do
+        (( first == 0 )) && echo "    ,"
+        first=0
+        IFS='|' read -r sname sstate <<< "$key"
+        echo "    {"
+        echo "      \"job_id\": ${JS_LATEST[$key]},"
+        echo "      \"experiment\": \"$sname\","
+        echo "      \"partition\": \"${JS_PART[$key]}\","
+        echo "      \"state\": \"$sstate\","
+        echo "      \"elapsed\": \"${JS_DUR[$key]}\","
+        echo "      \"count\": ${JS_COUNT[$key]}"
+        echo "    }"
+    done
+    echo "  ],"
+
+    # -- Pending --
+    echo "  \"pending\": ["
+    for i in "${!PND_IDS[@]}"; do
+        (( i > 0 )) && echo "    ,"
+        echo "    {"
+        echo "      \"job_id\": ${PND_IDS[$i]},"
+        echo "      \"experiment\": \"${PND_NAMES[$i]}\","
+        echo "      \"partition\": \"${PND_PARTS[$i]}\","
+        echo "      \"reason\": \"${PND_REASONS[$i]}\""
+        echo "    }"
+    done
+    echo "  ]"
+    echo "}"
+    exit 0
+fi
+
+# ===========================================================================
+# HUMAN-READABLE OUTPUT
+# ===========================================================================
+
+echo "Cluster -- $NOW_DATE"
+echo ""
+
+# ---------------------------------------------------------------------------
+# RUNNING
+# ---------------------------------------------------------------------------
+echo "RUNNING (${#RUN_IDS[@]})"
+
+for i in "${!RUN_IDS[@]}"; do
+    jid="${RUN_IDS[$i]}"
+    name="${RUN_NAMES[$i]}"
+    part="${RUN_PARTS[$i]}"
+    node="${RUN_NODES[$i]}"
+
+    # Build field strings
+    ep_str=""
+    [[ -n "${R_EPOCH[$i]}" && -n "${R_TOTAL[$i]}" ]] && ep_str="ep ${R_EPOCH[$i]}/${R_TOTAL[$i]}"
+
+    best_str=""
+    if [[ -n "${R_BEST_EP[$i]}" && -n "${R_BEST_VAL[$i]}" ]]; then
+        gap3=$(printf '%.3f' "${R_BEST_VAL[$i]}")
+        best_str="best ${R_BEST_EP[$i]} (gap=${gap3})"
+    fi
+
+    pat_str=""
+    [[ -n "${R_PAT[$i]}" && -n "${R_MAXPAT[$i]}" ]] && pat_str="pat ${R_PAT[$i]}/${R_MAXPAT[$i]}"
+
+    loss_str=""
+    [[ -n "${R_LOSS[$i]}" ]] && loss_str="loss ${R_LOSS[$i]}"
+
+    eta_str=""
+    [[ -n "${R_ETA_H[$i]}" ]] && eta_str="ETA ${R_ETA_H[$i]}"
+
+    wall_str=""
+    [[ -n "${R_WALL_LEFT[$i]}" && "${R_WALL_LEFT[$i]}" -gt 0 ]] && wall_str="wall $(fmt_duration_no_secs "${R_WALL_LEFT[$i]}") left"
+
+    warn="${R_WARN[$i]}"
+
+    # Assemble line with name padded to 40 chars
+    line=$(printf "  %-8s %-40s %s/%s" "$jid" "$name" "$part" "$node")
+    [[ -n "$ep_str" ]]   && line+="  $ep_str"
+    [[ -n "$loss_str" ]] && line+="  $loss_str"
+    [[ -n "$best_str" ]] && line+="  $best_str"
+    [[ -n "$pat_str" ]]  && line+="  $pat_str"
+    [[ -n "$eta_str" ]]  && line+="  $eta_str"
+    [[ -n "$wall_str" ]] && line+="  $wall_str"
+    [[ -n "$warn" ]]     && line+="$warn"
+
+    echo "$line"
+done
+
+(( ${#RUN_IDS[@]} == 0 )) && echo "  (none)"
+echo ""
+
+# ---------------------------------------------------------------------------
+# RECENT / RECENT SHORT / PENDING — only when not --running
+# ---------------------------------------------------------------------------
+if (( OPT_RUNNING == 0 )); then
+
+    # -------------------------------------------------------------------
+    # RECENT (24h, >=10min)
+    # -------------------------------------------------------------------
+    echo "RECENT (24h)"
+    recent_printed=0
+    for i in "${!SACCT_IDS[@]}"; do
+        [[ "${RC_IS_SHORT[$i]}" != "0" ]] && continue
+        recent_printed=1
+
+        jid="${SACCT_IDS[$i]}"
+        name="${SACCT_NAMES[$i]}"
+        part="${SACCT_PARTS[$i]}"
+        semantic="${RC_SEMANTIC[$i]}"
+        dur="${RC_DURATION[$i]}"
+
+        ep_str=""
+        [[ -n "${RC_EPOCH[$i]}" && -n "${RC_TOTAL[$i]}" ]] && ep_str="ep ${RC_EPOCH[$i]}/${RC_TOTAL[$i]}"
+
+        best_str=""
+        if [[ -n "${RC_BEST_EP[$i]}" && -n "${RC_BEST_VAL[$i]}" ]]; then
+            gap3=$(printf '%.3f' "${RC_BEST_VAL[$i]}")
+            best_str="best ${RC_BEST_EP[$i]} (gap=${gap3})"
+        fi
+
+        pat_str=""
+        [[ -n "${RC_PAT[$i]}" && -n "${RC_MAXPAT[$i]}" ]] && pat_str="pat ${RC_PAT[$i]}/${RC_MAXPAT[$i]}"
+
+        line=$(printf "  %-8s %-40s %s  %-12s %s" "$jid" "$name" "$part" "$semantic" "$dur")
+        [[ -n "$ep_str" ]]   && line+="  $ep_str"
+        [[ -n "$best_str" ]] && line+="  $best_str"
+        [[ -n "$pat_str" ]]  && line+="  $pat_str"
+
+        echo "$line"
+    done
+    (( recent_printed == 0 )) && echo "  (none)"
+    echo ""
+
+    # -------------------------------------------------------------------
+    # RECENT SHORT (<10m) — grouped by name+state
+    # -------------------------------------------------------------------
+    declare -A SH_LATEST SH_COUNT SH_PART SH_DUR
+    declare -a SH_KEYS_ORDERED=()
+
+    for i in "${!SACCT_IDS[@]}"; do
+        [[ "${RC_IS_SHORT[$i]}" != "1" ]] && continue
+        key="${SACCT_NAMES[$i]}|${SACCT_STATES[$i]}"
+        if [[ -z "${SH_LATEST[$key]:-}" ]]; then
+            SH_KEYS_ORDERED+=("$key")
+        fi
+        SH_LATEST["$key"]="${SACCT_IDS[$i]}"
+        SH_COUNT["$key"]=$(( ${SH_COUNT[$key]:-0} + 1 ))
+        SH_PART["$key"]="${SACCT_PARTS[$i]}"
+        SH_DUR["$key"]="${RC_DURATION[$i]}"
+    done
+
+    echo "RECENT SHORT (<10m)"
+    if (( ${#SH_KEYS_ORDERED[@]} > 0 )); then
+        for key in "${SH_KEYS_ORDERED[@]}"; do
+            IFS='|' read -r sname sstate <<< "$key"
+            jid="${SH_LATEST[$key]}"
+            part="${SH_PART[$key]}"
+            dur="${SH_DUR[$key]}"
+            cnt="${SH_COUNT[$key]}"
+
+            cnt_str=""
+            (( cnt > 1 )) && cnt_str="  (x$cnt)"
+
+            line=$(printf "  %-8s %-40s %s  %-12s %s" "$jid" "$sname" "$part" "$sstate" "$dur")
+            line+="$cnt_str"
+            echo "$line"
+        done
+    else
+        echo "  (none)"
+    fi
+    echo ""
+
+    # -------------------------------------------------------------------
+    # PENDING — only show if there are pending jobs
+    # -------------------------------------------------------------------
+    if (( ${#PND_IDS[@]} > 0 )); then
+        echo "PENDING (${#PND_IDS[@]})"
+        for i in "${!PND_IDS[@]}"; do
+            line=$(printf "  %-8s %-40s %s  %s" "${PND_IDS[$i]}" "${PND_NAMES[$i]}" "${PND_PARTS[$i]}" "${PND_REASONS[$i]}")
+            echo "$line"
+        done
+        echo ""
+    fi
+fi
+
+# ---------------------------------------------------------------------------
+# RESOURCES (running jobs only)
+# ---------------------------------------------------------------------------
+if (( ${#RUN_IDS[@]} > 0 )); then
+    echo "---"
+    echo "RESOURCES"
+    for i in "${!RUN_IDS[@]}"; do
+        jid="${RUN_IDS[$i]}"
+        n_gpus="${SC_GPUS[$jid]:-$DEF_GPUS}"
+        n_cpus="${SC_CPUS[$jid]:-$DEF_CPUS}"
+        alloc_mem="${SC_MEM[$jid]:-$DEF_MEM}"
+
+        # GPU string
+        gpu_str="GPU"
+        if [[ -n "${R_GPU_UTIL[$i]}" ]]; then
+            gpu_str+=" ${R_GPU_UTIL[$i]}%"
+        else
+            gpu_str+=" --%"
+        fi
+        if [[ -n "${R_GPU_USED[$i]}" && -n "${R_GPU_TOTAL[$i]}" ]]; then
+            gpu_str+=" ${R_GPU_USED[$i]}/${R_GPU_TOTAL[$i]}G"
+        fi
+        gpu_str+=" ($n_gpus gpu)"
+
+        # CPU string
+        cpu_str="CPU"
+        if [[ -n "${R_CPU_UTIL[$i]}" ]]; then
+            cpu_str+=" ${R_CPU_UTIL[$i]}%"
+        else
+            cpu_str+=" --%"
+        fi
+        cpu_str+=" ($n_cpus cores)"
+
+        # RAM string
+        ram_str="RAM"
+        if [[ -n "${R_RAM_USED[$i]}" ]]; then
+            ram_str+=" ${R_RAM_USED[$i]}/$alloc_mem"
+        else
+            ram_str+=" --/$alloc_mem"
+        fi
+
+        echo "  $jid  $gpu_str  $cpu_str  $ram_str"
+    done
+    echo ""
+fi

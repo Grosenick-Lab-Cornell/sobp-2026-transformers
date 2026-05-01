@@ -1,0 +1,143 @@
+#!/usr/bin/env python3
+"""mrl-eval: Submit an evaluation/probe script as a SLURM job.
+
+Usage:
+    mrl-eval SCRIPT_PATH [SCRIPT_ARGS...] [--slurm-partition=PART] [--slurm-time=HH:MM:SS]
+             [--slurm-gpus=N] [--slurm-cpus=N] [--slurm-mem=XG] [--slurm-job-name=NAME]
+
+All --slurm-* flags are consumed by mrl-eval. Everything else is passed through
+to the script.
+"""
+import os
+import sys
+import re
+
+# Bootstrap: ensure we're running under the project venv
+CONFIG_PATH = os.path.expanduser("~/.mrl/config.yaml")
+with open(CONFIG_PATH) as _f:
+    for _line in _f:
+        _m = re.match(r'project_dir:\s*(.+)', _line)
+        if _m:
+            _venv_python = os.path.join(_m.group(1).strip(), '.venv', 'bin', 'python')
+            if os.path.realpath(sys.executable) != os.path.realpath(_venv_python):
+                os.execv(_venv_python, [_venv_python] + sys.argv)
+            break
+
+import argparse
+import shlex
+import subprocess
+import tempfile
+from pathlib import Path
+
+import yaml
+
+
+def load_config():
+    with open(CONFIG_PATH) as f:
+        return yaml.safe_load(f)
+
+
+def main():
+    config = load_config()
+
+    project_dir = config['project_dir']
+    slurm_module = config['modules']['slurm']
+    cudnn_module = config['modules']['cudnn']
+    defaults = config['defaults']
+
+    parser = argparse.ArgumentParser(description='Submit eval/probe script to SLURM')
+    parser.add_argument('script_path', type=str,
+                        help='Path to Python script, relative to project dir')
+    parser.add_argument('--slurm-partition', type=str, default=defaults['partition'])
+    parser.add_argument('--slurm-time', type=str, default='01:00:00')
+    parser.add_argument('--slurm-gpus', type=int, default=defaults['gpus'])
+    parser.add_argument('--slurm-cpus', type=int, default=defaults['cpus'])
+    parser.add_argument('--slurm-mem', type=str, default=defaults['mem'])
+    parser.add_argument('--slurm-job-name', type=str, default=None)
+
+    args, script_args = parser.parse_known_args()
+
+    # --- Verify script exists ---
+
+    script_full_path = Path(project_dir) / args.script_path
+    assert script_full_path.exists(), f"Script not found: {script_full_path}"
+
+    # --- Partition / account lookup ---
+
+    partition = args.slurm_partition
+    assert partition in config['partitions'], \
+        f"Unknown partition '{partition}'. Available: {list(config['partitions'].keys())}"
+
+    partition_cfg = config['partitions'][partition]
+    account = partition_cfg['account']
+    qos = partition_cfg['qos']
+
+    # --- Defaults ---
+
+    job_name = args.slurm_job_name or Path(args.script_path).stem
+    script_args_str = shlex.join(script_args) if script_args else ''
+
+    # --- Create eval_logs dir ---
+
+    eval_logs_dir = Path(project_dir) / 'eval_logs'
+    eval_logs_dir.mkdir(exist_ok=True)
+
+    # --- Generate sbatch script ---
+
+    mem_line = f"#SBATCH --mem={args.slurm_mem}" if args.slurm_mem else ''
+
+    sbatch_content = f"""\
+#!/bin/bash
+#SBATCH --job-name={job_name}
+#SBATCH --output={project_dir}/eval_logs/slurm_%j.out
+#SBATCH --error={project_dir}/eval_logs/slurm_%j.err
+#SBATCH --nodes=1
+#SBATCH --gpus={args.slurm_gpus}
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task={args.slurm_cpus}
+#SBATCH --time={args.slurm_time}
+#SBATCH --partition={partition}
+#SBATCH --account={account}
+#SBATCH --qos={qos}
+{mem_line}
+
+module load {cudnn_module}
+
+source {project_dir}/.venv/bin/activate
+
+cd {project_dir}
+PYTHONPATH=. python {args.script_path} {script_args_str}
+"""
+
+    sbatch_file = tempfile.NamedTemporaryFile(
+        suffix='.sh', delete=False, dir=str(eval_logs_dir), mode='w'
+    )
+    sbatch_file.write(sbatch_content)
+    sbatch_file.close()
+
+    # --- Submit ---
+
+    result = subprocess.run(
+        ['bash', '-l', '-c', f'module load {slurm_module} && sbatch {sbatch_file.name}'],
+        capture_output=True, text=True
+    )
+
+    if result.returncode != 0:
+        print(f"EVAL SUBMIT FAILED: {result.stderr.strip()}")
+        sys.exit(1)
+
+    job_id_match = re.search(r'Submitted batch job (\d+)', result.stdout)
+    assert job_id_match, f"Could not parse job ID from sbatch output: {result.stdout}"
+    job_id = job_id_match.group(1)
+
+    print(f"EVAL OK: Job {job_id}")
+    print(f"  Script:     {args.script_path}")
+    print(f"  Args:       {script_args_str}")
+    print(f"  Partition:  {partition} ({account})")
+    print(f"  Time:       {args.slurm_time}")
+    print(f"  GPUs:       {args.slurm_gpus}")
+    print(f"  Logs:       {project_dir}/eval_logs/slurm_{job_id}.*")
+
+
+if __name__ == '__main__':
+    main()

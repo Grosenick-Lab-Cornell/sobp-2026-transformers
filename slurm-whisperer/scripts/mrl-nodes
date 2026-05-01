@@ -1,0 +1,67 @@
+#!/bin/bash -l
+# mrl-nodes: Show cluster node availability and backfill opportunities
+SLURM_MODULE=$(awk '/^modules:/{f=1;next} f&&/^  slurm:/{print $2;exit}' "$HOME/.mrl/config.yaml" 2>/dev/null)
+module load "${SLURM_MODULE:-slurm/slurm/25.05.2}" 2>/dev/null
+set -euo pipefail
+
+CONFIG="$HOME/.mrl/config.yaml"
+
+# Read partition names from config (lines with 2-space indent under partitions:)
+PARTITIONS=$(awk '/^partitions:/{flag=1; next} flag && /^  [a-z]/{s=$1; sub(/:/, "", s); print s; next} flag && /^[^ ]/{flag=0}' "$CONFIG")
+
+if [ -z "$PARTITIONS" ]; then
+    echo "ERROR: No partitions found in $CONFIG" >&2
+    exit 1
+fi
+
+echo "=== Node Status ==="
+echo ""
+
+# Per-partition node info
+for partition in $PARTITIONS; do
+    echo "--- $partition ---"
+    part_total=0
+    part_free=0
+    unavail=""
+    # -O with wide widths prevents truncation of GresUsed
+    # Process substitution (not pipe) so variables persist after the loop
+    while read -r node state gres gres_used; do
+        # Parse total GPUs from Gres (e.g. "gpu:8", "gpu:a100:8", "gpu:h100:8(S:0-1)")
+        total_gpu=0
+        if [[ "$gres" =~ gpu(:[a-zA-Z0-9_]+)?:([0-9]+) ]]; then
+            total_gpu=${BASH_REMATCH[2]}
+        fi
+        # Parse used GPUs from GresUsed (e.g. "gpu:(null):0", "gpu:(null):8(IDX:0-7)")
+        used_gpu=0
+        if [[ "$gres_used" =~ gpu:[^:]*:([0-9]+) ]]; then
+            used_gpu=${BASH_REMATCH[1]}
+        fi
+        free_gpu=$((total_gpu - used_gpu))
+        part_total=$((part_total + total_gpu))
+        part_free=$((part_free + free_gpu))
+        # Track unavailable nodes (not idle, mixed, or allocated)
+        case "$state" in
+            idle|mixed|allocated) ;;
+            *) unavail="$unavail ${node}(${state})" ;;
+        esac
+        printf "  %-6s %-12s %d/%d gpu\n" "$node" "$state" "$free_gpu" "$total_gpu"
+    done < <(sinfo -N -p "$partition" -O "NodeHost:20,StateLong:20,Gres:30,GresUsed:80" --noheader 2>/dev/null)
+    # Summary line
+    summary="  Total: ${part_total} gpu, ${part_free} free"
+    if [ -n "$unavail" ]; then
+        summary="$summary | Unavail:$unavail"
+    fi
+    echo "$summary"
+    echo ""
+done
+
+echo "=== Running Jobs ==="
+squeue -t RUNNING -o "%.10i %.25j %.10P %.10M %.10l %.4C %R" --noheader 2>/dev/null || echo "  No running jobs"
+echo ""
+
+echo "=== Pending Jobs ==="
+squeue -t PENDING -o "%.10i %.25j %.10P %.10l %R" --noheader 2>/dev/null || echo "  No pending jobs"
+echo ""
+
+echo "=== Queue Depth ==="
+squeue -t PENDING -o "%.12P" --noheader 2>/dev/null | sort | uniq -c | sed 's/^/  /' || echo "  Empty"

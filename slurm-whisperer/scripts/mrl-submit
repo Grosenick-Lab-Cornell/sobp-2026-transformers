@@ -1,0 +1,302 @@
+#!/usr/bin/env python3
+"""mrl-submit: Snapshot code and submit SLURM job.
+
+Usage:
+    mrl-submit CONFIG_PATH [--partition=PART] [--time=HH:MM:SS] [--time-min=HH:MM:SS]
+                           [--gpus=N] [--cpus=N] [--mem=XG] [--exclude=NODES]
+
+This script runs ON the cluster. The local skill rsyncs code to the project dir first,
+then calls this script via SSH.
+"""
+import os
+import sys
+import re
+
+# Bootstrap: ensure we're running under the project venv
+CONFIG_PATH = os.path.expanduser("~/.mrl/config.yaml")
+with open(CONFIG_PATH) as _f:
+    for _line in _f:
+        _m = re.match(r'project_dir:\s*(.+)', _line)
+        if _m:
+            _venv_python = os.path.join(_m.group(1).strip(), '.venv', 'bin', 'python')
+            if os.path.realpath(sys.executable) != os.path.realpath(_venv_python):
+                os.execv(_venv_python, [_venv_python] + sys.argv)
+            break
+
+import argparse
+import shutil
+import subprocess
+from pathlib import Path
+
+import yaml
+
+
+def load_config():
+    with open(CONFIG_PATH) as f:
+        return yaml.safe_load(f)
+
+
+def parse_time_to_minutes(time_str):
+    """Parse a SLURM --time string into total minutes.
+
+    Supported formats: MM, HH:MM, HH:MM:SS, D-HH, D-HH:MM, D-HH:MM:SS
+    """
+    # D-HH:MM:SS or D-HH:MM or D-HH
+    if '-' in time_str:
+        parts = time_str.split('-', 1)
+        days = int(parts[0])
+        rest = parts[1]
+    else:
+        days = 0
+        rest = time_str
+
+    colon_parts = rest.split(':')
+    if len(colon_parts) == 1:
+        # Bare number: if days were present, it's hours (D-HH); otherwise minutes (MM)
+        if days > 0:
+            return days * 24 * 60 + int(colon_parts[0]) * 60
+        else:
+            return int(colon_parts[0])
+    elif len(colon_parts) == 2:
+        # HH:MM
+        hours = int(colon_parts[0])
+        minutes = int(colon_parts[1])
+        return days * 24 * 60 + hours * 60 + minutes
+    elif len(colon_parts) == 3:
+        # HH:MM:SS
+        hours = int(colon_parts[0])
+        minutes = int(colon_parts[1])
+        seconds = int(colon_parts[2])
+        return days * 24 * 60 + hours * 60 + minutes + (1 if seconds > 0 else 0)
+    else:
+        assert False, f"Cannot parse SLURM time format: '{time_str}'"
+
+
+def main():
+    config = load_config()
+
+    project_dir = config['project_dir']
+    scratch_dir = config['scratch_dir']
+    slurm_module = config['modules']['slurm']
+    cudnn_module = config['modules']['cudnn']
+    defaults = config['defaults']
+
+    parser = argparse.ArgumentParser(description='Snapshot code and submit SLURM job')
+    parser.add_argument('config_path', type=str,
+                        help='Path to training config YAML, relative to project dir')
+    parser.add_argument('--partition', type=str, default=defaults['partition'],
+                        help=f"SLURM partition (default: {defaults['partition']})")
+    parser.add_argument('--time', type=str, default=None,
+                        help='Time limit (HH:MM:SS). Default from partition config.')
+    parser.add_argument('--time-min', type=str, default=None,
+                        help='Minimum time for backfill (HH:MM:SS)')
+    parser.add_argument('--gpus', type=int, default=defaults['gpus'],
+                        help=f"Number of GPUs (default: {defaults['gpus']})")
+    parser.add_argument('--cpus', type=int, default=defaults['cpus'],
+                        help=f"CPUs per task (default: {defaults['cpus']})")
+    parser.add_argument('--mem', type=str, default=defaults['mem'],
+                        help=f"Memory (default: {defaults['mem']})")
+    parser.add_argument('--exclude', type=str, default=None,
+                        help='Nodes to exclude')
+    args = parser.parse_args()
+
+    # --- Pre-flight checks ---
+
+    config_full_path = Path(project_dir) / args.config_path
+    assert config_full_path.exists(), f"Config file not found: {config_full_path}"
+
+    with open(config_full_path) as f:
+        train_config = yaml.safe_load(f)
+
+    assert 'output_dir' in train_config, \
+        f"Training config {args.config_path} missing 'output_dir' key"
+
+    exp_name = os.path.basename(train_config['output_dir'])
+    output_dir = Path(scratch_dir) / 'outputs' / exp_name
+
+    # --- Partition / account lookup ---
+
+    partition = args.partition
+    assert partition in config['partitions'], \
+        f"Unknown partition '{partition}'. Available: {list(config['partitions'].keys())}"
+
+    partition_cfg = config['partitions'][partition]
+    account = partition_cfg['account']
+    qos = partition_cfg['qos']
+    time_limit = args.time or partition_cfg['default_time']
+
+    # --- Time limit validation ---
+
+    total_minutes = parse_time_to_minutes(time_limit)
+    assert total_minutes >= 10, (
+        f"Time limit '{time_limit}' = {total_minutes} minutes. "
+        f"This is too short for a training job (minimum 10 minutes)."
+    )
+
+    if total_minutes > 12 * 60:
+        total_hours = total_minutes / 60
+        warning = f"WARNING: Time limit '{time_limit}' = {total_hours:.1f} hours."
+        # For HH:MM:SS without day prefix, suggest the swap (e.g. 30:00:00 -> 00:30:00)
+        parts = time_limit.split(':')
+        if '-' not in time_limit and len(parts) == 3 and int(parts[0]) > 12:
+            warning += f" If you meant {parts[0]} minutes, use --time=00:{parts[0]}:00"
+        print(warning)
+
+    # --- Code snapshot ---
+
+    code_dir = output_dir / 'code'
+    if code_dir.exists():
+        shutil.rmtree(code_dir)
+
+    # Custom ignore function: 'data' and 'outputs' should only be excluded
+    # at the project root level, not inside subpackages (e.g. mypkg/data/).
+    _base_ignore = shutil.ignore_patterns(
+        '__pycache__', '*.pyc', '*.mmap', '*.npy', '*.pt', '*.pth',
+        '*.bin', '*.egg-info', '.git', '.venv', '.env', '.claude',
+        '.obsidian', 'memory', 'docs', 'tests',
+        'build', 'dist',
+    )
+    _root_only_dirs = {'data', 'outputs', 'tmp'}
+
+    def _ignore_fn(directory, contents):
+        ignored = _base_ignore(directory, contents)
+        if os.path.realpath(directory) == os.path.realpath(project_dir):
+            ignored = ignored | _root_only_dirs
+        return ignored
+
+    shutil.copytree(
+        project_dir, str(code_dir),
+        ignore=_ignore_fn,
+    )
+
+    # --- Config snapshot ---
+
+    config_snapshot = output_dir / 'config.yaml'
+    shutil.copy2(config_full_path, config_snapshot)
+
+    # --- Git metadata (best-effort) ---
+
+    git_dir = Path(project_dir) / '.git'
+    if git_dir.exists():
+        result = subprocess.run(
+            ['git', '-C', project_dir, 'rev-parse', 'HEAD'],
+            capture_output=True, text=True
+        )
+        if result.returncode == 0:
+            (output_dir / 'git_commit.txt').write_text(result.stdout.strip())
+
+        result = subprocess.run(
+            ['git', '-C', project_dir, 'diff'],
+            capture_output=True, text=True
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            (output_dir / 'git_diff.patch').write_text(result.stdout)
+
+    # --- Pre-flight: verify training script exists and has valid syntax ---
+
+    train_script = defaults['train_script']
+    train_script_path = code_dir / train_script
+    assert train_script_path.exists(), f"Training script not found in snapshot: {train_script_path}"
+
+    venv_python = str(Path(project_dir) / '.venv' / 'bin' / 'python')
+    preflight = subprocess.run(
+        [venv_python, '-m', 'py_compile', str(train_script_path)],
+        capture_output=True, text=True
+    )
+    assert preflight.returncode == 0, \
+        f"Pre-flight syntax check failed:\n{preflight.stderr}"
+
+    # --- Pre-flight: verify data directory exists ---
+
+    preprocessed_dir = train_config.get('preprocessed_dir')
+    if preprocessed_dir:
+        data_path = Path(project_dir) / preprocessed_dir
+        assert data_path.exists(), f"Preprocessed data dir not found: {data_path}"
+
+    # --- Generate sbatch script ---
+
+    optional_lines = []
+    if args.time_min:
+        optional_lines.append(f"#SBATCH --time-min={args.time_min}")
+    if args.mem:
+        optional_lines.append(f"#SBATCH --mem={args.mem}")
+    if args.exclude:
+        optional_lines.append(f"#SBATCH --exclude={args.exclude}")
+
+    optional_block = '\n'.join(optional_lines)
+    if optional_block:
+        optional_block = '\n' + optional_block
+
+    submit_script = output_dir / 'submit.sh'
+    submit_script.write_text(f"""\
+#!/bin/bash
+#SBATCH --job-name={exp_name}
+#SBATCH --output={output_dir}/slurm_%j.out
+#SBATCH --error={output_dir}/slurm_%j.err
+#SBATCH --nodes=1
+#SBATCH --gpus={args.gpus}
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task={args.cpus}
+#SBATCH --time={time_limit}
+#SBATCH --partition={partition}
+#SBATCH --account={account}
+#SBATCH --qos={qos}
+#SBATCH --requeue{optional_block}
+
+module load {cudnn_module}
+
+source {project_dir}/.venv/bin/activate
+
+OUTPUT_DIR={output_dir}
+CODE_DIR=$OUTPUT_DIR/code
+
+# GPU and CPU monitoring
+nvidia-smi --query-gpu=timestamp,utilization.gpu,utilization.memory,memory.used,memory.total --format=csv -l 60 > $OUTPUT_DIR/gpu_usage.csv 2>&1 &
+NVIDIA_PID=$!
+vmstat -t 60 > $OUTPUT_DIR/cpu_usage.log &
+VMSTAT_PID=$!
+
+# Run from project dir (for relative config paths like preprocessed_dir)
+# PYTHONPATH points to snapshot so imports use frozen code
+cd {project_dir}
+PYTHONPATH=$CODE_DIR python $CODE_DIR/{train_script} --config $OUTPUT_DIR/config.yaml 2>&1 | tee -a $OUTPUT_DIR/train.log
+TRAIN_EXIT=${{PIPESTATUS[0]}}
+
+# Extract embeddings from best checkpoint (pooled + ROI-level)
+if [ $TRAIN_EXIT -eq 0 ]; then
+    PYTHONPATH=$CODE_DIR python $CODE_DIR/scripts/posttraining_extract_embeddings.py --experiment-dir $OUTPUT_DIR 2>&1 | tee -a $OUTPUT_DIR/extract.log
+else
+    echo "Training exited with code $TRAIN_EXIT, skipping extraction" >> $OUTPUT_DIR/extract.log
+fi
+
+kill $NVIDIA_PID $VMSTAT_PID 2>/dev/null
+""")
+
+    # --- Submit ---
+
+    result = subprocess.run(
+        ['bash', '-l', '-c', f'module load {slurm_module} && sbatch {submit_script}'],
+        capture_output=True, text=True
+    )
+
+    if result.returncode != 0:
+        print(f"SUBMIT FAILED: {result.stderr.strip()}")
+        sys.exit(1)
+
+    # Parse job ID from "Submitted batch job 12345"
+    job_id_match = re.search(r'Submitted batch job (\d+)', result.stdout)
+    assert job_id_match, f"Could not parse job ID from sbatch output: {result.stdout}"
+    job_id = job_id_match.group(1)
+
+    print(f"SUBMIT OK: Job {job_id}")
+    print(f"  Experiment: {exp_name}")
+    print(f"  Partition:  {partition} ({account})")
+    print(f"  Time:       {time_limit}")
+    print(f"  GPUs:       {args.gpus}")
+    print(f"  Code:       {code_dir}")
+    print(f"  Config:     {config_snapshot}")
+    print(f"  Output:     {output_dir}")
+
+
+if __name__ == '__main__':
+    main()
